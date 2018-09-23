@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-cn">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文地址：https://www.valentinog.com/blog/ui-testing-jest-puppetteer/#jest-puppeteer-visual-debug 原文作者： Valentino Gagliardi  自从 Puppeteer 这个库出现以来，我就开始考虑用 Jest 和 Puppeteer 进行测试了。 Puppeteer 有很多有意思的 API。  接下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="教程：用 Jest 与 Puppeteer 进行 UI test">
+<meta property="og:url" content="https://olafcheng.github.io/2018/04/18/ui-test-with-jest-and-puppeteer/index.html">
+<meta property="og:site_name" content="olaf&#39;s site">
+<meta property="og:description" content="原文地址：https://www.valentinog.com/blog/ui-testing-jest-puppetteer/#jest-puppeteer-visual-debug 原文作者： Valentino Gagliardi  自从 Puppeteer 这个库出现以来，我就开始考虑用 Jest 和 Puppeteer 进行测试了。 Puppeteer 有很多有意思的 API。  接下">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="https://www.valentinog.com/blog/wp-content/uploads/2017/10/testing-with-jest-puppeteer-wp.jpg">
+<meta property="og:image" content="https://www.valentinog.com/blog/wp-content/uploads/2017/10/testing-with-jest-and-puppeteer-contact-form.png">
+<meta property="og:image" content="https://www.valentinog.com/blog/wp-content/uploads/2017/10/puppeteer-logo.png">
+<meta property="og:image" content="https://www.valentinog.com/blog/wp-content/uploads/2017/10/testing-with-jest-and-puppeteer-test-suite.png">
+<meta property="og:updated_time" content="2018-04-18T20:11:44.058Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="教程：用 Jest 与 Puppeteer 进行 UI test">
+<meta name="twitter:description" content="原文地址：https://www.valentinog.com/blog/ui-testing-jest-puppetteer/#jest-puppeteer-visual-debug 原文作者： Valentino Gagliardi  自从 Puppeteer 这个库出现以来，我就开始考虑用 Jest 和 Puppeteer 进行测试了。 Puppeteer 有很多有意思的 API。  接下">
+<meta name="twitter:image" content="https://www.valentinog.com/blog/wp-content/uploads/2017/10/testing-with-jest-puppeteer-wp.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://olafcheng.github.io/2018/04/18/ui-test-with-jest-and-puppeteer/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>教程：用 Jest 与 Puppeteer 进行 UI test | olaf's site</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">olaf's site</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://olafcheng.github.io/2018/04/18/ui-test-with-jest-and-puppeteer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="olaf cheng">
+      <meta itemprop="description" content="纸上得来终觉浅，绝知此事要躬行。">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="olaf's site">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">教程：用 Jest 与 Puppeteer 进行 UI test
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-04-18 16:59:00" itemprop="dateCreated datePublished" datetime="2018-04-18T16:59:00+08:00">2018-04-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-04-19 04:11:44" itemprop="dateModified" datetime="2018-04-19T04:11:44+08:00">2018-04-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/translation-ui-test-jest-puppeteer-test/" itemprop="url" rel="index"><span itemprop="name">translation ui-test jest puppeteer test</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>原文地址：<a href="https://www.valentinog.com/blog/ui-testing-jest-puppetteer/#jest-puppeteer-visual-debug" target="_blank" rel="noopener">https://www.valentinog.com/blog/ui-testing-jest-puppetteer/#jest-puppeteer-visual-debug</a></p>
+<p>原文作者： <a href="http://www.valentinog.com/" target="_blank" rel="noopener">Valentino Gagliardi</a></p>
+</blockquote>
+<p>自从 <strong>Puppeteer</strong> 这个库出现以来，我就开始考虑用 <strong>Jest 和 Puppeteer 进行测试</strong>了。 Puppeteer 有很多有意思的 API。</p>
+<p><img src="https://www.valentinog.com/blog/wp-content/uploads/2017/10/testing-with-jest-puppeteer-wp.jpg" alt="Banner"></p>
+<p>接下来的文章我将会以联系人表单为例，简单的讲解如何<strong>对其进行 UI Test</strong>。</p>
+<p>测试的技术选型，我们会使用 Jest 和 Puppeteer。</p>
+<p>昨天在写测试的时候，刚好看到了 Kent C.Dodds 写的文章。</p>
+<p>“<a href="https://blog.kentcdodds.com/making-your-ui-tests-resilient-to-change-d37a6ee37269" target="_blank" rel="noopener">让 UI 测试脚本更耐用一些</a>”这篇文章里，阐述了怎么样通过使用 <code>data-*</code> 属性来让 UI 测试脚本更不容易失效。</p>
+<p><code>data-*</code> 属性可以在几乎任何 HTML 元素上定义一个 data 属性。当需要利用 JavaScript 操作 HTML 进行数据交换的时候，这个属性特别有用。</p>
+<p>Kent 的文章来的很是时候，因为当时我恰好也要写类似的东西了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">await</span> page.waitForSelector(<span class="string">"#contact-form"</span>);</span><br><span class="line"><span class="keyword">await</span> page.click(<span class="string">"#name"</span>);</span><br><span class="line"><span class="keyword">await</span> page.type(<span class="string">"#name"</span>, user.name);</span><br></pre></td></tr></table></figure>
+<p>尽管我不太喜欢用自定义 <code>data-*</code> 这种方法来进行测试，但是不得不承认，这是一个好方法。不管你的程序是大型工程还是小型项目，这个方法都适用，但是在文章里，我还是用比较经典的元素选择的例子来写一下 demo。</p>
+<p>号外，你对<a href="https://www.valentinog.com/blog/javascript-end-to-end-testing-cypress/" target="_blank" rel="noopener"><em>持续集成</em></a>感兴趣么？感兴趣的话可以看一下 Cypress &gt;&gt; <a href="https://www.valentinog.com/blog/javascript-end-to-end-testing-cypress/" target="_blank" rel="noopener"><em>用 Cypress 进行更好的 JavaScript E2E 测试</em></a>。</p>
+<h2 id="用-Jest-与-Puppeteer-进行-UI-测试-测试一个联系人表单"><a href="#用-Jest-与-Puppeteer-进行-UI-测试-测试一个联系人表单" class="headerlink" title="用 Jest 与 Puppeteer 进行 UI 测试: 测试一个联系人表单"></a>用 Jest 与 Puppeteer 进行 UI 测试: 测试一个联系人表单</h2><p>我的目标是测试一个联系人表单。</p>
+<p>如下：</p>
+<p><img src="https://www.valentinog.com/blog/wp-content/uploads/2017/10/testing-with-jest-and-puppeteer-contact-form.png" alt="联系人表单"></p>
+<p>它有如下元素：</p>
+<ol>
+<li>一个输入名字的 input</li>
+<li>一个输入 email 的 input</li>
+<li>一个输入手机号的 input</li>
+<li>一个 textarea</li>
+<li>一个隐私设置的 checkbox</li>
+<li>一个提交 button</li>
+</ol>
+<p>如果我想测试这个联系人列表，我应该怎么做呢？</p>
+<p><strong>测试</strong>上面这个表单，意味着要断言<strong>用户可以提交一个网络请求</strong>。</p>
+<h2 id="用-Jest-与-Puppeteer-进行-UI-测试-安装工程"><a href="#用-Jest-与-Puppeteer-进行-UI-测试-安装工程" class="headerlink" title="用 Jest 与 Puppeteer 进行 UI 测试: 安装工程"></a>用 Jest 与 Puppeteer 进行 UI 测试: 安装工程</h2><p>我们先来小窥一下要用到的工具。</p>
+<p><img src="https://www.valentinog.com/blog/wp-content/uploads/2017/10/puppeteer-logo.png" alt="puppeteer"></p>
+<p><a href="https://facebook.github.io/jest/" target="_blank" rel="noopener"><strong>Jest</strong></a>: Facebook 开源的一个测试框架。Jest 通过一个基本的断言库(Except)提供了一个自动化测试的平台。</p>
+<p><a href="https://github.com/GoogleChrome/puppeteer" target="_blank" rel="noopener"><strong>Puppeteer</strong></a>: 一个用来控制 headless Chrome 的 Node.js 库。虽然这个库还很新，但是现在正是试试这个库是适于加入你的工作流的好时候。</p>
+<p><a href="https://www.npmjs.com/package/faker" target="_blank" rel="noopener"><strong>Faker</strong></a>: 一个用于产生随机数据的 Node.js 库。姓名、电话号码、地址。这个库很像 PHP 里的那个 Faker 库。</p>
+<p>如果你已经弄好工程目录了，可以用下面的命令来安装上述的库：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i jest puppeteer faker --save-dev</span><br></pre></td></tr></table></figure></p>
+<p>因为 Puppeteer 需要下载它自己所需要的版本的 Chromium，所以安装 Puppeteer 会花一些时间。</p>
+<p>Chromium 是一个在 Chrome 之后的开源浏览器。Chromium 和 Chrome 几乎共享了所有的功能，两者的差异只在部分协议的细节上。</p>
+<p>一旦安装完成了，你需要在 <code>package.json</code> 里配置一下 Jest。<code>test</code> 命令应该写成一个可执行的 Jest 命令：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"scripts": &#123;</span><br><span class="line">  "test": "jest"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在 Jest 脚本里，别忘了引入 Puppeteer：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> puppeteer <span class="keyword">from</span> <span class="string">"puppeteer"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>为了能用 ES6 的语法，我们需要为 Jest 配置 Babel。用下面这个命令安装跟 Babel 相关的东西：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i babel-core babel-jest babel-preset-env --save-dev</span><br></pre></td></tr></table></figure></p>
+<p>安装完以后，在你的工程目录里创建一个文件名为 <code>.babelrc</code> 的文件：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"presets"</span>: [<span class="string">"env"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上述这些都配置好后，我们就可以开始写一个简单的测试脚本了。</p>
+<h2 id="用-Jest-与-Puppeteer-进行-UI-测试-写测试脚本"><a href="#用-Jest-与-Puppeteer-进行-UI-测试-写测试脚本" class="headerlink" title="用 Jest 与 Puppeteer 进行 UI 测试: 写测试脚本"></a>用 Jest 与 Puppeteer 进行 UI 测试: 写测试脚本</h2><p>在你的工程目录下新建一个文件夹，可以命名为 <code>test</code> 或者 <code>spec</code>。然后在这个文件夹里建一个新的文件，名字是 <code>form.spec.js</code>。</p>
+<p>接下来我会把测试脚本拆成好几部分，把重点拿出来让你看看。在文章的末尾，我们能看到完整的代码。</p>
+<p>按照顺序引入 Fake 和 Puppeteer:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> faker <span class="keyword">from</span> <span class="string">"faker"</span>;</span><br><span class="line"><span class="keyword">import</span> puppeteer <span class="keyword">from</span> <span class="string">"puppeteer"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>配置表单的 URL(也许你想测试的是本地启动服务的开发版本，而不是真实的网站的生产版本)：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> APP = <span class="string">"https://www.change-this-to-your-website.com/contact-form.html"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>用 Faker 创建一个假的用户信息：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> lead = &#123;</span><br><span class="line">  name: faker.name.firstName(),</span><br><span class="line">  email: faker.internet.email(),</span><br><span class="line">  phone: faker.phone.phoneNumber(),</span><br><span class="line">  message: faker.random.words()</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>给 Puppeteer 定义一些变量：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> page;</span><br><span class="line"><span class="keyword">let</span> browser;</span><br><span class="line"><span class="keyword">const</span> width = <span class="number">1920</span>;</span><br><span class="line"><span class="keyword">const</span> height = <span class="number">1080</span>;</span><br></pre></td></tr></table></figure></p>
+<p>定义 Puppeteer 应该表现出怎么样的行为：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">beforeAll(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  browser = <span class="keyword">await</span> puppeteer.launch(&#123;</span><br><span class="line">    headless: <span class="literal">false</span>,</span><br><span class="line">    slowMo: <span class="number">80</span>,</span><br><span class="line">    args: [<span class="string">`--window-size=<span class="subst">$&#123;width&#125;</span>,<span class="subst">$&#123;height&#125;</span>`</span>]</span><br><span class="line">  &#125;);</span><br><span class="line">  page = <span class="keyword">await</span> browser.newPage();</span><br><span class="line">  <span class="keyword">await</span> page.setViewport(&#123; width, height &#125;);</span><br><span class="line">&#125;);</span><br><span class="line">afterAll(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  browser.close();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p><code>beforeAll</code> 和 <code>afterAll</code> 都是 Jest 方法。简单来说就是，在开始跑测试以前，我们必须用 Puppeteer 启动一个浏览器核心，然后用 <code>browser.newPage()</code> 启动打开一个新的页面。</p>
+<p>当测试用例完成了以后，浏览器核心必须通过 <code>browser.close()</code> 来进行关闭。</p>
+<p>除了 <code>beforeAll</code> 和 <code>afterAll</code> 以外，Jest 还有很多其他 API，详情可以看一下 <a href="https://facebook.github.io/jest/docs/en/api.html" target="_blank" rel="noopener">Jest 文档</a>。毕竟，整个测试只用一个浏览器来核心完成要比每个测试用例都重新启动和关闭浏览器核心要方便的多。</p>
+<p>上面的代码里有一些需要注意的地方：</p>
+<p>我在代码里用了 <code>headless: false</code> 来启动(lanuch)浏览器核心，以便把 Chromuim 真实的显示出来。这其实只是因为我需要录像来给你展示测试是如何工作的而已，并不是测试必须这样写。</p>
+<p>在实际测试过程中，并不需要打开一个实际的浏览器页面，所以到时候，只需要把跟 <code>lanuch</code> 方法相关的代码删除掉就可以了。</p>
+<p><code>setViewPort()</code> 也同样，可以删掉了。你也可以设置根据不同的环境来进行不同的 <code>lanuch</code> 操作，比如在开发环境中禁用 <code>headless</code> 模式以便<a href="./ui-test-with-jest-and-puppeteer.html#bonus">可视化调试</a>，在跑测试的时候只启动核心而不显示窗口。<a href="./ui-test-with-jest-and-puppeteer.html#bonus">点这里去了解一下怎么做</a>。</p>
+<p>现在我们可以写实际的测试脚本了：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">"Contact form"</span>, () =&gt; &#123;</span><br><span class="line">  test(<span class="string">"lead can submit a contact request"</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">await</span> page.goto(APP);</span><br><span class="line">    <span class="keyword">await</span> page.waitForSelector(<span class="string">"[data-test=contact-form]"</span>);</span><br><span class="line">    <span class="keyword">await</span> page.click(<span class="string">"input[name=name]"</span>);</span><br><span class="line">    <span class="keyword">await</span> page.type(<span class="string">"input[name=name]"</span>, lead.name);</span><br><span class="line">    <span class="keyword">await</span> page.click(<span class="string">"input[name=email]"</span>);</span><br><span class="line">    <span class="keyword">await</span> page.type(<span class="string">"input[name=email]"</span>, lead.email);</span><br><span class="line">    <span class="keyword">await</span> page.click(<span class="string">"input[name=tel]"</span>);</span><br><span class="line">    <span class="keyword">await</span> page.type(<span class="string">"input[name=tel]"</span>, lead.phone);</span><br><span class="line">    <span class="keyword">await</span> page.click(<span class="string">"textarea[name=message]"</span>);</span><br><span class="line">    <span class="keyword">await</span> page.type(<span class="string">"textarea[name=message]"</span>, lead.message);</span><br><span class="line">    <span class="keyword">await</span> page.click(<span class="string">"input[type=checkbox]"</span>);</span><br><span class="line">    <span class="keyword">await</span> page.click(<span class="string">"button[type=submit]"</span>);</span><br><span class="line">    <span class="keyword">await</span> page.waitForSelector(<span class="string">".modal"</span>);</span><br><span class="line">  &#125;, <span class="number">16000</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>注意，上面的代码里在 <a href="https://www.valentinog.com/blog/testing-api-koa-jest/" target="_blank" rel="noopener">Jest 里使用 async/await</a> 了。即假设你在用最新版本的 Node.js 了。</p>
+<p>我们来看看当使用 Jest 和 Puppeteer 的时候，headless Chrome 都做了些什么：</p>
+<ol>
+<li>打开 APP 里写的那个链接；</li>
+<li>等待联系人列表的 UI 渲染；</li>
+<li>点击、填入表单项；</li>
+<li>点击 checkbox；</li>
+<li>提交表单；</li>
+<li>等待 <code>.modal</code> 这个 DOM 元素出现。</li>
+</ol>
+<p>注意：注意以第二参数形式在 <code>test()</code> 方法里传递给 Jasmine 的超时时间（16000）。当你像看 Chrome 浏览器跟页面的交互的时候，这个设置是很有必要的。</p>
+<p>如果不是 headless 模式，并且没有配置超时时间的话，会得到如下的错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_TIMEOUT_INTERVAL</span><br></pre></td></tr></table></figure></p>
+<p>总之，当 Chrome 运行在 headless 模式的时候，的确可以移除超时设置的，只是会报错。</p>
+<p>然后用下面的命令来执行测试：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm test</span><br></pre></td></tr></table></figure></p>
+<p>然后你就可以看见下面这样的魔法了：</p>
+<iframe width="740" height="416" src="https://www.youtube.com/embed/qYo-NL2qFPM" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
+<h2 id="用-Jest-与-Puppeteer-进行测试：测试更多的部分"><a href="#用-Jest-与-Puppeteer-进行测试：测试更多的部分" class="headerlink" title="用 Jest 与 Puppeteer 进行测试：测试更多的部分"></a>用 Jest 与 Puppeteer 进行测试：测试更多的部分</h2><p>ok，现在联系人表单已经测试好了，我可以继续测试这个页面里其他部分的内容了。</p>
+<p>每个网页，应该都有一个<strong>有意义</strong>的标题对吧，那么怎么测试呢？</p>
+<p>下面的代码是用来测试 <code>&lt;title&gt;&lt;/title&gt;</code> 是否正确的：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">"Testing the frontend"</span>, () =&gt; &#123;</span><br><span class="line">  test(<span class="string">"assert that &lt;title&gt; is correct"</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> title = <span class="keyword">await</span> page.title();</span><br><span class="line">    expect(title).toBe(</span><br><span class="line">      <span class="string">"Gestione Server Dedicati | Full Managed | Assistenza Sistemistica"</span></span><br><span class="line">    );</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="comment">// 在下面你可以添加更多的测试用例！</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>导航栏呢？页面里至少应该有一个导航栏吧！</p>
+<p>用 Jest 与 Puppeteer 测试导航栏是否存在：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line">  test(<span class="string">"assert that a div named navbar exists"</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> navbar = <span class="keyword">await</span> page.$<span class="built_in">eval</span>(<span class="string">".navbar"</span>, el =&gt; (el ? <span class="literal">true</span> : <span class="literal">false</span>));</span><br><span class="line">    expect(navbar).toBe(<span class="literal">true</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="comment">//</span></span><br></pre></td></tr></table></figure></p>
+<p>或者测试一下，某个特定的元素里是否有期望的文本信息：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line">  test(<span class="string">"assert that main title contains the correct text"</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> mainTitleText = <span class="keyword">await</span> page.$<span class="built_in">eval</span>(<span class="string">"[data-test=main-title]"</span>, el =&gt; el.textContent);</span><br><span class="line">    expect(mainTitleText).toEqual(<span class="string">"GESTIONE SERVER, Full Managed"</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="comment">//</span></span><br></pre></td></tr></table></figure></p>
+<p>那么有关 SEO 应该怎么测试呢？</p>
+<p>用 Jest 与 Puppeteer 测试一下 <strong>SEO</strong> 关注的重点，比如一个友情链接是否存在：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">"SEO"</span>, () =&gt; &#123;</span><br><span class="line">  test(<span class="string">"canonical must be present"</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">await</span> page.goto(<span class="string">`<span class="subst">$&#123;APP&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">const</span> canonical = <span class="keyword">await</span> page.$<span class="built_in">eval</span>(<span class="string">"link[rel=canonical]"</span>, el =&gt; el.href);</span><br><span class="line">    expect(canonical).toEqual(<span class="string">"https://www.servermanaged.it/"</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>当然，还可以测试更多的内容。</p>
+<p>在那天写完 UI 测试后，看见那些绿色的标记，我很开心：<br><img src="https://www.valentinog.com/blog/wp-content/uploads/2017/10/testing-with-jest-and-puppeteer-test-suite.png" alt="测试用例通过情况"></p>
+<p><strong>Puppeteer</strong> 给了你无限的可能。现在有很多新的测试框架正在基于 Puppeteer 进行开发。当然，API 还会继续改善，但是要知道，基础条件是必不可少的。</p>
+<p>并且 Puppeteer 还能和 Jest 很好的结合在一起。</p>
+<h2 id="用-Jest-与-Puppeteer-进行测试：下一步"><a href="#用-Jest-与-Puppeteer-进行测试：下一步" class="headerlink" title="用 Jest 与 Puppeteer 进行测试：下一步"></a>用 Jest 与 Puppeteer 进行测试：下一步</h2><p>可能你会觉得 Puppeteer 本身或者 Puppeteer 的 API 并不够方便。我也懂你的感受。</p>
+<p>这个库还很新，但是现在是检验这个库是否适合融入你的工作流的好时候。</p>
+<p>Puppeteer 仍然在开发阶段中，并且接下来会有很多的改善。与此同时，你可以看看那些用了 <a href="https://www.cypress.io/" target="_blank" rel="noopener">Cypress</a> 的例子。</p>
+<p>你是怎么样测试你的程序的呢？有很多人在用 <a href="https://ropig.com/blog/end-end-tests-dont-suck-puppeteer/" target="_blank" rel="noopener">Puppeteer 做 E2E 测试</a>。你呢？</p>
+<p><br id="bonus"></p>
+<h2 id="附录：用-Jest-与-Puppeteer-进行测试时的可视化-debug"><a href="#附录：用-Jest-与-Puppeteer-进行测试时的可视化-debug" class="headerlink" title="附录：用 Jest 与 Puppeteer 进行测试时的可视化 debug"></a>附录：用 Jest 与 Puppeteer 进行测试时的可视化 debug</h2><p>Puppeteer 在使用的时候，你可以选择 Chromium 的 <strong>headless</strong> 和 <strong>非 headless</strong> 两种模式。</p>
+<p>就像我们之前看到的那样：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">beforeAll(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  browser = <span class="keyword">await</span> puppeteer.launch(&#123;</span><br><span class="line">      <span class="comment">// Debug mode !</span></span><br><span class="line">      headless: <span class="literal">false</span>,</span><br><span class="line">      slowMo: <span class="number">80</span>,</span><br><span class="line">      args: [<span class="string">`--window-size=1920,1080`</span>]</span><br><span class="line">    &#125;);</span><br><span class="line">  page = <span class="keyword">await</span> browser.newPage();</span><br><span class="line"><span class="comment">///</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果你想进行可视化的 debug，那就必须要给 Jasmine 设置一个超时时间用来启动浏览器核心。否则测试会很快的中止掉，因为异步请求全部被忽略掉了。这个超时时间被定义为 <code>test()</code> 函数的第二个参数。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">"Contact form"</span>, () =&gt; &#123;</span><br><span class="line">  test(</span><br><span class="line">    <span class="string">"lead can submit a contact request"</span>,</span><br><span class="line">    <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">///// some assertions</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="number">16000</span> <span class="comment">// &lt;&lt;&lt; Jasmine timeout</span></span><br><span class="line">  );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>但是当在自动化测试环境的时候，就不需要<strong>真的启动浏览器窗口</strong>了。如果你启动了，这将会导致这个测试永远的持续下去。所以怎么样<strong>在 headless 模式和普通模式之间轻松的进行切换</strong>呢？</p>
+<p>写点辅助函数，把这些函数放在文件 <code>testingInit.js</code> 里：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> isDebugging = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> debugging_mode = &#123;</span><br><span class="line">    puppeteer: &#123;</span><br><span class="line">      headless: <span class="literal">false</span>,</span><br><span class="line">      slowMo: <span class="number">80</span>,</span><br><span class="line">      args: [<span class="string">`--window-size=1920,1080`</span>]</span><br><span class="line">    &#125;,</span><br><span class="line">    jasmine: <span class="number">16000</span></span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">return</span> process.env.NODE_ENV === <span class="string">"debug"</span> ? debugging_mode : <span class="literal">false</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>然后你就可以在你的测试脚本里引用这个辅助函数了：<br>先是<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="keyword">import</span> &#123; isDebugging &#125; <span class="keyword">from</span> <span class="string">"./testingInit.js"</span>;</span><br><span class="line"><span class="comment">///</span></span><br><span class="line">beforeAll(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  browser = <span class="keyword">await</span> puppeteer.launch(isDebugging().puppeteer)); <span class="comment">// &lt;&lt;&lt; 可视化模式</span></span><br><span class="line">  page = <span class="keyword">await</span> browser.newPage();</span><br><span class="line"><span class="comment">///</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 一些脚本</span></span><br><span class="line"></span><br><span class="line">describe(<span class="string">"Contact form"</span>, () =&gt; &#123;</span><br><span class="line">  test(</span><br><span class="line">    <span class="string">"lead can submit a contact request"</span>,</span><br><span class="line">    <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">///// 一些断言</span></span><br><span class="line">    &#125;, isDebugging().jasmine <span class="comment">// &lt;&lt;&lt; Jasmine timeout</span></span><br><span class="line">  );</span><br></pre></td></tr></table></figure></p>
+<p>然后你就可以用命令分别用这两种模式来启动了，如果你想用 headless 模式启动的话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm test</span><br></pre></td></tr></table></figure></p>
+<p>下面是如何用 debug 模式启动：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NODE_ENV=debug npm test</span><br></pre></td></tr></table></figure></p>
+<p>感谢阅读！</p>
+<p>图片来源：<a href="https://unsplash.com/@shotbyjames" target="_blank" rel="noopener">https://unsplash.com/@shotbyjames</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/14/this-in-react-with-es6/" rel="next" title="[译]React 与 ES6 - 第三部分，为 React 类绑定方法(ES7 同理)">
+                <i class="fa fa-chevron-left"></i> [译]React 与 ES6 - 第三部分，为 React 类绑定方法(ES7 同理)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/16/how-to-write-a-custom-eslint-rule/" rel="prev" title="如何写编写自定义 ESLint 规则">
+                如何写编写自定义 ESLint 规则 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">olaf cheng</p>
+              <p class="site-description motion-element" itemprop="description">纸上得来终觉浅，绝知此事要躬行。</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#用-Jest-与-Puppeteer-进行-UI-测试-测试一个联系人表单"><span class="nav-number">1.</span> <span class="nav-text">用 Jest 与 Puppeteer 进行 UI 测试: 测试一个联系人表单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用-Jest-与-Puppeteer-进行-UI-测试-安装工程"><span class="nav-number">2.</span> <span class="nav-text">用 Jest 与 Puppeteer 进行 UI 测试: 安装工程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用-Jest-与-Puppeteer-进行-UI-测试-写测试脚本"><span class="nav-number">3.</span> <span class="nav-text">用 Jest 与 Puppeteer 进行 UI 测试: 写测试脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用-Jest-与-Puppeteer-进行测试：测试更多的部分"><span class="nav-number">4.</span> <span class="nav-text">用 Jest 与 Puppeteer 进行测试：测试更多的部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用-Jest-与-Puppeteer-进行测试：下一步"><span class="nav-number">5.</span> <span class="nav-text">用 Jest 与 Puppeteer 进行测试：下一步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附录：用-Jest-与-Puppeteer-进行测试时的可视化-debug"><span class="nav-number">6.</span> <span class="nav-text">附录：用 Jest 与 Puppeteer 进行测试时的可视化 debug</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">olaf cheng</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

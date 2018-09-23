@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-cn">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在 CSS3 flex 布局中, 为什么没有justify-self 和 justify-items 属性?译自: http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties flex 容器内,主轴上元素的排列方法, 是如下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译]在 CSS3 flex 布局中, 为什么没有 justify-self 和 justify-items 属性?">
+<meta property="og:url" content="https://olafcheng.github.io/2017/03/02/translation_why_are_there_no_justify_self_and_justify_items/index.html">
+<meta property="og:site_name" content="olaf&#39;s site">
+<meta property="og:description" content="在 CSS3 flex 布局中, 为什么没有justify-self 和 justify-items 属性?译自: http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties flex 容器内,主轴上元素的排列方法, 是如下">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="https://i.stack.imgur.com/YOzeU.png">
+<meta property="og:image" content="https://i.stack.imgur.com/13Z1u.png">
+<meta property="og:image" content="https://i.stack.imgur.com/oKi7M.png">
+<meta property="og:image" content="https://i.stack.imgur.com/0mQqd.png">
+<meta property="og:image" content="https://i.stack.imgur.com/u4BH6.png">
+<meta property="og:image" content="https://i.stack.imgur.com/D3Vnv.png">
+<meta property="og:image" content="https://i.stack.imgur.com/Um8DM.png">
+<meta property="og:image" content="https://i.stack.imgur.com/qLzgU.png">
+<meta property="og:image" content="https://i.stack.imgur.com/HtaOc.png">
+<meta property="og:image" content="https://i.stack.imgur.com/M2WkZ.png">
+<meta property="og:image" content="https://i.stack.imgur.com/BtbfK.png">
+<meta property="og:image" content="https://i.stack.imgur.com/lV9a0.png">
+<meta property="og:image" content="https://i.stack.imgur.com/3IeTy.png">
+<meta property="og:image" content="https://i.stack.imgur.com/BmtRt.png">
+<meta property="og:image" content="https://i.stack.imgur.com/U1eLb.png">
+<meta property="og:image" content="https://i.stack.imgur.com/Jjw9w.png">
+<meta property="og:updated_time" content="2017-03-02T15:17:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[译]在 CSS3 flex 布局中, 为什么没有 justify-self 和 justify-items 属性?">
+<meta name="twitter:description" content="在 CSS3 flex 布局中, 为什么没有justify-self 和 justify-items 属性?译自: http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties flex 容器内,主轴上元素的排列方法, 是如下">
+<meta name="twitter:image" content="https://i.stack.imgur.com/YOzeU.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://olafcheng.github.io/2017/03/02/translation_why_are_there_no_justify_self_and_justify_items/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>[译]在 CSS3 flex 布局中, 为什么没有 justify-self 和 justify-items 属性? | olaf's site</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">olaf's site</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://olafcheng.github.io/2017/03/02/translation_why_are_there_no_justify_self_and_justify_items/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="olaf cheng">
+      <meta itemprop="description" content="纸上得来终觉浅，绝知此事要躬行。">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="olaf's site">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">[译]在 CSS3 flex 布局中, 为什么没有 justify-self 和 justify-items 属性?
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-03-02 21:07:00 / Modified: 23:17:27" itemprop="dateCreated datePublished" datetime="2017-03-02T21:07:00+08:00">2017-03-02</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/CSS-flex-layout-margin-translation/" itemprop="url" rel="index"><span itemprop="name">CSS flex layout margin translation</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="在-CSS3-flex-布局中-为什么没有justify-self-和-justify-items-属性"><a href="#在-CSS3-flex-布局中-为什么没有justify-self-和-justify-items-属性" class="headerlink" title="在 CSS3 flex 布局中, 为什么没有justify-self 和 justify-items 属性?"></a>在 <code>CSS3</code> <code>flex</code> 布局中, 为什么没有<code>justify-self</code> 和 <code>justify-items</code> 属性?</h2><p>译自: <a href="http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties" target="_blank" rel="noopener">http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties</a></p>
+<p><strong><code>flex</code> 容器内,主轴上元素的排列方法, 是如下定义的:</strong></p>
+<blockquote>
+<p>To align flex items along the main axis there is one property: justify-content</p>
+<p>To align flex items along the cross axis there are three properties: align-content, align-items and align-self.</p>
+</blockquote>
+<p>译文:</p>
+<blockquote>
+<p>为了排列主轴上的 <code>flex</code> 元素, 我们有这样的一个属性: <code>justify-content</code></p>
+<p>而为了排列交叉轴上的 <code>flex</code> 元素, 我们却有三个属性: <code>align-content</code>, <code>align-items</code> 还有 <code>align-self</code>.</p>
+</blockquote>
+<p>于是问题就出现了:</p>
+<blockquote>
+<p> 为什么在  <code>CSS3 flex</code> 布局中, 没有<code>justify-self</code> 和 <code>justify-items</code> 属性?</p>
+</blockquote>
+<p>可以这样回答: 这两个额外的属性, 没有进行规范的必要。</p>
+<p><a href="http://www.w3.org/TR/css-flexbox-1/" target="_blank" rel="noopener"><code>flexbox</code> 的规范</a>指出了两种排列主轴 <code>flex</code> 元素的方法:</p>
+<ol>
+<li><code>justify-content</code> 属性, 还有</li>
+<li><a href="https://www.w3.org/TR/css-flexbox-1/#auto-margins" target="_blank" rel="noopener"><code>auto margins</code></a></li>
+</ol>
+<hr>
+<h3 id="justify-content"><a href="#justify-content" class="headerlink" title="justify-content"></a>justify-content</h3><p><a href="http://www.w3.org/TR/css-flexbox-1/#justify-content-property" target="_blank" rel="noopener">justify-content</a> 属性用来排布 <code>flex</code> 容器中, 主轴上的元素。</p>
+<p>这个元素作用在 <code>flex</code> 的容器元素上, 但是会对所有 <code>flex</code> 容器里的子元素产生影响。</p>
+<p>下面是 5 种排列的选项:</p>
+<ul>
+<li><code>flex-start</code> ~ 元素靠近一行的开头</li>
+</ul>
+<p><img src="https://i.stack.imgur.com/YOzeU.png" alt="flex-start"></p>
+<ul>
+<li><code>flex-end</code> ~ 元素靠近一行的末尾</li>
+</ul>
+<p><img src="https://i.stack.imgur.com/13Z1u.png" alt="flex-end"></p>
+<ul>
+<li><code>center</code> ~ 元素靠近一行的中间</li>
+</ul>
+<p><img src="https://i.stack.imgur.com/oKi7M.png" alt="center"></p>
+<ul>
+<li><code>space-between</code> ~ 元素被均匀的分散开, 其中, 第一个元素位于一行的开头, 而最后一个元素位于一行的末尾. 而一行的开头和末尾, 则由 <a href="http://www.w3.org/TR/css-flexbox-1/#flex-direction-property" target="_blank" rel="noopener"><code>flex-direction</code></a> 还有 <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/direction" target="_blank" rel="noopener"><code>writting mode</code></a>(<code>ltr</code> 或者 <code>rtl</code>)来决定。</li>
+</ul>
+<p><img src="https://i.stack.imgur.com/0mQqd.png" alt="space-between"></p>
+<ul>
+<li><code>space-around</code> ~ 除了每个元素的开头和结尾都有一半的间隔以外, 和 <code>space-between</code> 是一样的。</li>
+</ul>
+<p><img src="https://i.stack.imgur.com/u4BH6.png" alt="space-around"></p>
+<h3 id="自动外边距-Auto-Margins"><a href="#自动外边距-Auto-Margins" class="headerlink" title="自动外边距 (Auto Margins)"></a>自动外边距 (Auto Margins)</h3><p><a href="http://www.w3.org/TR/css-flexbox-1/#auto-margins" target="_blank" rel="noopener"><code>auto</code> margin</a>(恰当的利用外边距的 <code>auto</code> 属性) 可以让元素居中排列、均匀分散或者是分组排列。</p>
+<p><code>auto</code> margin 是作用在 <code>flex</code> 容器的子元素本身上的, 不像 <code>justify-content</code> 属性是作用在父级容器上的。</p>
+<h3 id="将一组子元素靠右排列-而将第一个子元素单独靠左排列"><a href="#将一组子元素靠右排列-而将第一个子元素单独靠左排列" class="headerlink" title="将一组子元素靠右排列, 而将第一个子元素单独靠左排列"></a>将一组子元素靠右排列, 而将第一个子元素单独靠左排列</h3><p><strong>问题发生的情景</strong>:</p>
+<blockquote>
+<p>让一组 <code>flex</code> 元素靠右排列(<code>justify-content: flex-end</code>), 而其中的第一个元素, 靠左排列(<code>justify-self: flex-start</code>)</p>
+<p><em>想象一下一个带有 logo 的导航条。如果有了 <code>justify-content</code> 和 <code>justify-self</code> 属性, 那么这个导航条就可以完美的用 <code>flex</code> 布局来实现, 从而如丝般顺滑的自适应各种尺寸的屏幕(译注: 由于大量 ie8/6 的存在, 国内现状并不是这样)。</em></p>
+</blockquote>
+<p><img src="https://i.stack.imgur.com/D3Vnv.png" alt="flexes-0"><br><img src="https://i.stack.imgur.com/Um8DM.png" alt="flexes-1"></p>
+<p><strong>其他的可能会用到的场景:</strong><br><img src="https://i.stack.imgur.com/qLzgU.png" alt="flexes-2"><br><img src="https://i.stack.imgur.com/HtaOc.png" alt="flexes-3"><br><img src="https://i.stack.imgur.com/M2WkZ.png" alt="flexes-4"></p>
+<hr>
+<p>把一个 <code>flex</code> 元素放到 <code>flex</code> 容器的一角:<br>比如下面的场景:</p>
+<blockquote>
+<p>把一个 <code>flex</code> 元素放到 <code>flex</code> 容器的一角  .box { align-self: flex-end; justify-self: flex-end; }</p>
+</blockquote>
+<p><img src="https://i.stack.imgur.com/BtbfK.png" alt="flexes-5"></p>
+<hr>
+<p><strong>水平垂直居中一个 <code>flex</code> 元素</strong><br><img src="https://i.stack.imgur.com/lV9a0.png" alt="flexes-6"></p>
+<p><code>margin: auto;</code> 可以用来替代 <code>justify-content: center; align-items: center;</code>, 就像下面这样：</p>
+<p>从<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">    <span class="attribute">justify-content</span>: center;</span><br><span class="line">    <span class="attribute">align-items</span>: center;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>换成<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.box56</span> &#123;</span><br><span class="line">    <span class="attribute">margin</span>: auto;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>或许你会问, 这两个有什么区别呢？当你想<a href="http://stackoverflow.com/q/33454533/3597276" target="_blank" rel="noopener">水平垂直居中一个大小超过 <code>flex</code> 容器 的 <code>flex</code> 元素</a>时, 就会知道了。</p>
+<hr>
+<p><strong>居中一个 <code>flex</code> 元素, 然后在第一个 <code>flex</code> 元素和底边缘的中间再放置一个水平居中的 <code>flex</code> 元素</strong></p>
+<p><code>flex</code> 容器内元素的排列是通过分配剩余的空间来实现的。</p>
+<p>因此，为了在一个独立元素的旁边, 再居中放置一个元素, 必须对某些属性进行抵销。</p>
+<p>In the examples below, invisible third flex items (boxes 61 &amp; 68) are introduced to balance out the “real” items (box 63 &amp; 66).</p>
+<p>在下面的例子中, 不可见的第三个 <code>flex</code> 元素(boxes 61 和 68), 被用来实现居中布局, 以便让显示出来的元素(boxes 63 和 66)符合居中要求。</p>
+<p><img src="https://i.stack.imgur.com/3IeTy.png" alt="flexes-7"><br><img src="https://i.stack.imgur.com/BmtRt.png" alt="flexes-8"></p>
+<p>不过，这种布局方法在语义上并无可取之处。</p>
+<p>我们也可以用伪元素来替代真实的 DOM 元素。也可以用绝对定位来实现这个要求，参见<a href="http://stackoverflow.com/q/36191516/3597276" target="_blank" rel="noopener">flexbox 中的绝对定位</a> 中介绍的三种办法。</p>
+<p><em>注意: 上面的例子只适用于部分居中的要求 ———— 如果容器元素是等宽等高的(when the outermost items are equal height/width)或者 <code>flex</code> 容器的子元素是不同长度的，再看看接下来的例子。</em></p>
+<p><strong>当相邻的元素尺寸不相同时，如何居中 <code>flex</code> 元素</strong></p>
+<p>看下面的案例要求：</p>
+<blockquote>
+<p>在某一行上有三个元素，想实现第二个元素居中显示(<code>justify-content: center</code>)，而第一个和第三个分别靠左(<code>justify-self: flex-start</code>)和靠右显示(<code>justify-self: flex-end</code>)。</p>
+<p><strong>注意</strong>: <code>space-around</code> 和 <code>space-between</code> 在这里是无法达到想要的那种效果的，因为需要进行均匀排列的元素本身的宽度是不一样的(<a href="http://jsfiddle.net/7an37m20/12/" target="_blank" rel="noopener">看这个例子</a>)。</p>
+</blockquote>
+<p>正如上面提到的注意事项所说，在 DOM 结构上处于中间的那个元素，只有在相邻的元素等高或者等宽(取决于 <code>flex-direction</code>)的时候，才能真正的居中。这时候，我们就特别需要 <code>justify-self</code> 属性。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-id">#container</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">justify-content</span>: space-between;</span><br><span class="line">  <span class="attribute">background-color</span>: lightyellow;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.box</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">50px</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">75px</span>;</span><br><span class="line">  <span class="attribute">background-color</span>: springgreen;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.box1</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.box3</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#center</span> &#123;</span><br><span class="line">  <span class="attribute">text-align</span>: center;</span><br><span class="line">  <span class="attribute">margin-bottom</span>: <span class="number">5px</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#center</span> &gt; <span class="selector-tag">span</span> &#123;</span><br><span class="line">  <span class="attribute">background-color</span>: aqua;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">2px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"center"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">span</span>&gt;</span>真正的居中显示<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box box1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box box2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box box3"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>只有当相邻元素的尺寸相同时，处于中间位置的 DOM 元素才能真正的居中显示。<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>(点击<a href="http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties" target="_blank" rel="noopener">这里</a>, 前往原答案查看代码的效果)</p>
+<p>解决这个问题的办法有两种。</p>
+<h3 id="方案一：-绝对定位"><a href="#方案一：-绝对定位" class="headerlink" title="方案一： 绝对定位"></a>方案一： 绝对定位</h3><p><code>flexbox</code> 规定，允许其子元素用绝对定位进行布局。这样的话，相邻元素尺寸不相同的中间元素进行居中布局，也成为了有可能的事情。</p>
+<p>别忘了，绝对定位的元素会脱离<a href="https://www.w3.org/TR/CSS22/visuren.html#normal-flow" target="_blank" rel="noopener">文本流</a>。这也就意味着它不再占据其容器元素的空间，并且可以和其他兄弟元素重叠在一起。</p>
+<p>在下面的例子中，三个子元素中间的那个元素用绝对定位，居中显示在了容器的正中央，而两个相邻的兄弟元素则仍然保持在文本流中。</p>
+<p>其实这个方法也可以反过来用：对三个字元素中间的那个元素使用 <code>justify-content: center</code> 属性，对它的两个兄弟元素用绝对定位。</p>
+<p><img src="https://i.stack.imgur.com/U1eLb.png" alt="flexes-9"></p>
+<h3 id="方案二：-嵌套使用-flex-容器-不使用绝对定位"><a href="#方案二：-嵌套使用-flex-容器-不使用绝对定位" class="headerlink" title="方案二： 嵌套使用 flex 容器(不使用绝对定位)"></a>方案二： 嵌套使用 <code>flex</code> 容器(不使用绝对定位)</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.box</span> &#123;</span><br><span class="line">  <span class="attribute">flex</span>: <span class="number">1</span>;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">justify-content</span>: center;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.box71</span> &gt; <span class="selector-tag">span</span> &#123; <span class="attribute">margin-right</span>: auto; &#125;</span><br><span class="line"><span class="selector-class">.box73</span> &gt; <span class="selector-tag">span</span> &#123; <span class="attribute">margin-left</span>: auto;  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* non-essential */</span></span><br><span class="line"><span class="selector-class">.box</span> &#123;</span><br><span class="line">  <span class="attribute">align-items</span>: center;</span><br><span class="line">  <span class="attribute">border</span>: <span class="number">1px</span> solid <span class="number">#ccc</span>;</span><br><span class="line">  <span class="attribute">background-color</span>: lightgreen;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">40px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box box71"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span>&gt;</span>71 短<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box box72"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span>&gt;</span>72 居中<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box box73"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span>&gt;</span>73 非常长长长长长长长长长长的元素<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>(点击<a href="http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties" target="_blank" rel="noopener">这里</a>, 前往原答案查看代码的效果)</p>
+<p>这种方法的工作原理：</p>
+<ul>
+<li>顶层 div(<code>.container</code>) 是一个 <code>flex</code> 容器</li>
+<li>每个 div(<code>.box</code>) 元素, 都是一个 <code>flex</code> 元素</li>
+<li>为了能均匀的分配容器的空间, 每个 <code>.box</code> 元素都被赋了 <code>flex: 1</code> 属性</li>
+<li>现在每行的元素所占据的容器空间都是想等的</li>
+<li>把每个 <code>flex</code> 元素都加上属性，变成 <code>flex</code> 容器(译注：就叫二级容器好了), 然后再在其中嵌套 <code>flex</code> 元素，并且给这些新的 <code>flex</code> 容器加上 <code>justify-content: center</code> 属性</li>
+<li>现在每个 <code>span</code> 元素是一个居中的 <code>flex</code> 元素了</li>
+<li>加上上面讲的<strong>自动外边距</strong>的方法, 让同一行中的外侧的二级容器分别靠左和靠右对齐</li>
+</ul>
+<p>之所以上面的方法可行，是因为在根据规范, 外边距的布局优先级是高于 <code>justify-content</code> 的：</p>
+<blockquote>
+<p>8.1. Aligning with auto margins</p>
+<p>Prior to alignment via justify-content and align-self, any positive free space is distributed to auto margins in that dimension.</p>
+</blockquote>
+<p>译文:</p>
+<blockquote>
+<p>8.1 用自动外边距来排列元素</p>
+<p>对应任何剩余的空间分配上, 自动外边距都有高于 <code>justify-content</code> 和 <code>align-self</code> 的分配权。</p>
+</blockquote>
+<h3 id="justify-content-space-same-概念"><a href="#justify-content-space-same-概念" class="headerlink" title="justify-content: space-same (概念)"></a><strong><em>justify-content: space-same (概念)</em></strong></h3><p>再回到 <a href="http://stackoverflow.com/a/33856609/3597276" target="_blank" rel="noopener"><code>justify-content</code></a> 这个属性上, 其实这个属性已经有了一个新的构想的值:</p>
+<ul>
+<li><strong>space-same</strong> ~<br>一种 <code>space-between</code> 和 <code>space-around</code> 的混合体。这个属性就像 <code>space-between</code> 一样能让元素均匀分布，只不过这次不是让两头的元素在外边缘之能分配到一半的空间了，而是分配到和两两元素中间一样大小的空间。</li>
+</ul>
+<p>这种布局效果也能通过在 <code>flex</code> 容器上设置 <code>::after</code> 和 <code>::before</code> 两个伪元素来实现。<br><img src="https://i.stack.imgur.com/Jjw9w.png" alt="flexes-10"></p>
+<p>答案作者: <a href="http://stackoverflow.com/users/3597276/michael-b" target="_blank" rel="noopener">Michael_B</a></p>
+<p>原文链接: <a href="http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties" target="_blank" rel="noopener">http://stackoverflow.com/questions/32551291/in-css-flexbox-why-are-there-no-justify-items-and-justify-self-properties</a></p>
+<p>并没有取得原作者的授权，直接翻译并发布了，本来是想联系作者的，但是找不到邮箱，StackOverflow 荣誉也不够，无法留言。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/24/ife-2017-demos/" rel="next" title="百度 IFE 前端学院 2017 demo">
+                <i class="fa fa-chevron-left"></i> 百度 IFE 前端学院 2017 demo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/12/road-of-read-source-code-of-vue-step-0/" rel="prev" title="实现一个 MVVM 中的 Observer (step 0)">
+                实现一个 MVVM 中的 Observer (step 0) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">olaf cheng</p>
+              <p class="site-description motion-element" itemprop="description">纸上得来终觉浅，绝知此事要躬行。</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#在-CSS3-flex-布局中-为什么没有justify-self-和-justify-items-属性"><span class="nav-number">1.</span> <span class="nav-text">在 CSS3 flex 布局中, 为什么没有justify-self 和 justify-items 属性?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#justify-content"><span class="nav-number">1.1.</span> <span class="nav-text">justify-content</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动外边距-Auto-Margins"><span class="nav-number">1.2.</span> <span class="nav-text">自动外边距 (Auto Margins)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将一组子元素靠右排列-而将第一个子元素单独靠左排列"><span class="nav-number">1.3.</span> <span class="nav-text">将一组子元素靠右排列, 而将第一个子元素单独靠左排列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案一：-绝对定位"><span class="nav-number">1.4.</span> <span class="nav-text">方案一： 绝对定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案二：-嵌套使用-flex-容器-不使用绝对定位"><span class="nav-number">1.5.</span> <span class="nav-text">方案二： 嵌套使用 flex 容器(不使用绝对定位)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#justify-content-space-same-概念"><span class="nav-number">1.6.</span> <span class="nav-text">justify-content: space-same (概念)</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">olaf cheng</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-cn">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="因为译者还没有写过这个插件, 而且英文水平有限, 所以这篇文章里还存在很多错误, 也有部分看不懂而没法翻译的地方, 读者如果愿意斧正的话， 请发邮件到我的邮箱 olafcheng@gmail.com 后续我在发现文章里的更正确的翻译后, 也会更新这篇译文.   原文地址：https://eslint.org/docs/developer-guide/working-with-rules  注意：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何写编写自定义 ESLint 规则">
+<meta property="og:url" content="https://olafcheng.github.io/2018/06/16/how-to-write-a-custom-eslint-rule/index.html">
+<meta property="og:site_name" content="olaf&#39;s site">
+<meta property="og:description" content="因为译者还没有写过这个插件, 而且英文水平有限, 所以这篇文章里还存在很多错误, 也有部分看不懂而没法翻译的地方, 读者如果愿意斧正的话， 请发邮件到我的邮箱 olafcheng@gmail.com 后续我在发现文章里的更正确的翻译后, 也会更新这篇译文.   原文地址：https://eslint.org/docs/developer-guide/working-with-rules  注意：">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2018-06-16T11:06:45.572Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何写编写自定义 ESLint 规则">
+<meta name="twitter:description" content="因为译者还没有写过这个插件, 而且英文水平有限, 所以这篇文章里还存在很多错误, 也有部分看不懂而没法翻译的地方, 读者如果愿意斧正的话， 请发邮件到我的邮箱 olafcheng@gmail.com 后续我在发现文章里的更正确的翻译后, 也会更新这篇译文.   原文地址：https://eslint.org/docs/developer-guide/working-with-rules  注意：">
+
+
+
+
+
+
+  <link rel="canonical" href="https://olafcheng.github.io/2018/06/16/how-to-write-a-custom-eslint-rule/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>如何写编写自定义 ESLint 规则 | olaf's site</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">olaf's site</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://olafcheng.github.io/2018/06/16/how-to-write-a-custom-eslint-rule/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="olaf cheng">
+      <meta itemprop="description" content="纸上得来终觉浅，绝知此事要躬行。">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="olaf's site">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">如何写编写自定义 ESLint 规则
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-06-16 13:55:49 / Modified: 19:06:45" itemprop="dateCreated datePublished" datetime="2018-06-16T13:55:49+08:00">2018-06-16</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/eslint/" itemprop="url" rel="index"><span itemprop="name">eslint</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p><strong>因为译者还没有写过这个插件, 而且英文水平有限, 所以这篇文章里还存在很多错误, 也有部分看不懂而没法翻译的地方, 读者如果愿意斧正的话， 请发邮件到我的邮箱 <a href="mailto:olafcheng@gmail.com" target="_blank" rel="noopener">olafcheng@gmail.com</a></strong></p>
+<p>后续我在发现文章里的更正确的翻译后, 也会更新这篇译文.</p>
+</blockquote>
+<blockquote>
+<p>原文地址：<a href="https://eslint.org/docs/developer-guide/working-with-rules" target="_blank" rel="noopener">https://eslint.org/docs/developer-guide/working-with-rules</a></p>
+</blockquote>
+<p><strong>注意：</strong> 这个文章里，主要覆盖率 ESLint &gt;= 3.0.0 版本的规则，如果想要看已废弃的规则，请点<a href="https://eslint.org/docs/developer-guide/working-with-rules-deprecated" target="_blank" rel="noopener">这里</a>.</p>
+<p>每个规则，在 ESLint 里都有以这个规则为标识符为开头命名的三个文件(比如, <code>no-extra-semi</code>).</p>
+<ul>
+<li>在 <code>lib/rules</code> 目录下： 一个源文件（例如，<code>no-extra-semi.js</code>）</li>
+<li>在 <code>tests/lib/rules</code> 目录下: 一个测试文件 (例如, <code>no-extra-semi.js</code>)</li>
+<li>在 <code>docs/rules</code> 目录: 一个 markdown 文档文件 (例如, <code>no-extra-semi</code>)</li>
+</ul>
+<p><strong>需要注意的重点：</strong>如果你想要给 ESLint 仓库提交一个<code>核心</code>规则，你<strong>必须</strong>遵循下列约定.</p>
+<p>下面是规则源文件的基本格式：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @fileoverview Rule to disallow unnecessary semicolons</span></span><br><span class="line"><span class="comment"> * @author Nicholas C. Zakas</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">"use strict"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">// Rule Definition</span></span><br><span class="line"><span class="comment">//------------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    meta: &#123;</span><br><span class="line">        docs: &#123;</span><br><span class="line">            description: <span class="string">"disallow unnecessary semicolons"</span>,</span><br><span class="line">            category: <span class="string">"Possible Errors"</span>,</span><br><span class="line">            recommended: <span class="literal">true</span>,</span><br><span class="line">            url: <span class="string">"https://eslint.org/docs/rules/no-extra-semi"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        fixable: <span class="string">"code"</span>,</span><br><span class="line">        schema: [] <span class="comment">// no options</span></span><br><span class="line">    &#125;,</span><br><span class="line">    create: <span class="function"><span class="keyword">function</span>(<span class="params">context</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            <span class="comment">// callback functions</span></span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="规则基础"><a href="#规则基础" class="headerlink" title="规则基础"></a>规则基础</h2><p>规则的源文件会 exports 出一个带有下列字段的 object：</p>
+<p><code>meta</code> (object) 包含了规则的元数据:</p>
+<ul>
+<li><p><code>docs</code> (object) 对于 ESLint 的核心规则来说，是必须的:</p>
+</li>
+<li><ul>
+<li><code>description</code> (string) 提供了会显示在<a href="https://eslint.org/docs/rules/" target="_blank" rel="noopener">规则目录</a>里的简短描述</li>
+</ul>
+</li>
+<li><ul>
+<li><code>category</code> (string) 规定了这个规则在<a href="https://eslint.org/docs/rules/" target="_blank" rel="noopener">规则目录</a>中分数哪个部分</li>
+</ul>
+</li>
+<li><ul>
+<li><code>recommended</code> (boolean) 是否需要包含在<a href="https://eslint.org/docs/user-guide/configuring" target="_blank" rel="noopener">配置文件</a>的 “extends”: “eslint:recommended” 这个属性默认开启的规则里.</li>
+</ul>
+</li>
+<li><ul>
+<li><code>url</code> (string) 规定了可以在哪个地方可以访问这个规则的详细信息</li>
+</ul>
+</li>
+</ul>
+<p>在自定义规则或者插件里，可以不包含 <code>docs</code> 字段，其实其他字段也是一样的，可以去除掉.</p>
+<ul>
+<li><p><code>fixable</code> (string) 可选值有 “code” 和 “whitespace”, 这个字段决定当在命令行里加上<code>--fix</code>参数的时候, 要不要自动的纠正报错的地方</p>
+<p><strong>注意:</strong> 如果没有 <code>fixable</code> 字段, 就算在实现规则的时候写了 <code>fix</code> 函数, ESLint 也不会对报错的地方<a href="https://eslint.org/docs/developer-guide/working-with-rules#applying-fixes" target="_blank" rel="noopener">进行纠正</a>. 如果规则是不可自动纠正的话，请不要写 <code>fixable</code> 这个字段.</p>
+</li>
+</ul>
+<ul>
+<li><p><code>schema</code> (array) 这个字段可以约束<a href="https://eslint.org/docs/developer-guide/working-with-rules#options-schemas" target="_blank" rel="noopener">规则的写法</a>, 以便 ESLint 发现有无效的<a href="https://eslint.org/docs/user-guide/configuring" target="_blank" rel="noopener">规则配置文件</a> 时进行报错.</p>
+<ul>
+<li><code>deprecated</code> (boolean) 用来表明这个规则是否已经被废弃. 如果规则还正在使用的话，请不要写这个字段.</li>
+</ul>
+</li>
+</ul>
+<p><code>create</code> (function) 返回一个用来遍历(<code>visit</code>) JavaScript 代码的抽象语法树(一个按照<a href="https://github.com/estree/estree" target="_blank" rel="noopener">ES 树</a>来定义的 AST)节点的对象，这个对象上会挂有一些方法，以便 ESLint 在 AST 上调用:</p>
+<ul>
+<li>if a key is a node type or a selector, ESLint calls that visitor function while going down the tree</li>
+<li>if a key is a node type or a selector plus :exit, ESLint calls that visitor function while going up the tree</li>
+<li>if a key is an event name, ESLint calls that handler function for code path analysis</li>
+</ul>
+<p>规则可以利用当前的代码片段和附近的 AST 来报错或者纠正问题.</p>
+<p>下面是 <a href="https://eslint.org/docs/rules/array-callback-return" target="_blank" rel="noopener">array-call-back</a> 规则的一些方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">checkLastSegment</span> (<span class="params">node</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// report problem for function if last code path segment is reachable</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    meta: &#123; ... &#125;,</span><br><span class="line">    create: <span class="function"><span class="keyword">function</span>(<span class="params">context</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// declare the state of the rule</span></span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            ReturnStatement: <span class="function"><span class="keyword">function</span>(<span class="params">node</span>) </span>&#123;</span><br><span class="line">                <span class="comment">// at a ReturnStatement node while going down</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="comment">// at a function expression node while going up:</span></span><br><span class="line">            <span class="string">"FunctionExpression:exit"</span>: checkLastSegment,</span><br><span class="line">            <span class="string">"ArrowFunctionExpression:exit"</span>: checkLastSegment,</span><br><span class="line">            onCodePathStart: <span class="function"><span class="keyword">function</span> (<span class="params">codePath, node</span>) </span>&#123;</span><br><span class="line">                <span class="comment">// at the start of analyzing a code path</span></span><br><span class="line">            &#125;,</span><br><span class="line">            onCodePathEnd: <span class="function"><span class="keyword">function</span>(<span class="params">codePath, node</span>) </span>&#123;</span><br><span class="line">                <span class="comment">// at the end of analyzing a code path</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="上下文-Object"><a href="#上下文-Object" class="headerlink" title="上下文 Object"></a>上下文 Object</h2><p><code>context</code> 对象包含了一些额外的函数，可以帮助规则来完成工作. 顾名思义，<code>context</code> 对象包含了跟规则相关的一些上下文的信息.<code>context</code> 对象包含如下的字段：</p>
+<ul>
+<li><code>parserOptions</code> - 在运行的时候，将要用到的解析规则的参数(更多细节看<a href="https://eslint.org/docs/user-guide/configuring" target="_blank" rel="noopener">这里</a>)</li>
+<li><code>id</code> - 规则 ID.</li>
+<li><code>options</code> - 给这个规则传递的<a href="https://eslint.org/docs/user-guide/configuring" target="_blank" rel="noopener">配置信息</a>. 这个数组不包含规则本身. 详细信息看<a href="https://eslint.org/docs/developer-guide/working-with-rules#contextoptions" target="_blank" rel="noopener">这里</a>.</li>
+<li>settings - 来自配置信息的<a href="https://eslint.org/docs/user-guide/configuring" target="_blank" rel="noopener">共享设置</a>.</li>
+<li>parserPath - 来自配置信息的 parser 的名字</li>
+<li>parserServices - 一个包含了规则的解析器服务的对象. 默认的解析器并不提供任何服务. 然而, 如果一个规则想要使用自定义的解释器的话, 它就可以通过 <code>parserServices</code> 来访问自定义解释器提供的各种结果. (例如, TypeScript 的解释器可以计算出来一个给定的节点的数据类型)</li>
+</ul>
+<p>除此之外, <code>context</code> 对象还含有如下的方法:</p>
+<ul>
+<li><code>getAncestors()</code> - 返回一个包含了所有遍历过的父节点的数组, 这些父节点从 AST 的根节点开始, 直到这个节点的直接父节点. 这个数组不包含这个节点本身.</li>
+<li><code>getDeclaredVariables(node)</code> - 返回给定节点定义的<a href="https://eslint.org/docs/developer-guide/scope-manager-interface" target="_blank" rel="noopener">变量</a>的列表. 这个信息可以用来跟踪变量的引用信息.</li>
+<li><ul>
+<li>如果给定节点是一个 <code>VariableDeclaration</code>, 返回这个变量声明里声明的所有变量.</li>
+</ul>
+</li>
+<li><ul>
+<li>如果给定节点是一个 <code>VariableDeclarator</code>, 返回这个变量声明里声明的所有变量(译者注: 两者的区别可以看<a href="https://juejin.im/post/582425402e958a129926fcb4" target="_blank" rel="noopener">这里</a>).</li>
+</ul>
+</li>
+<li><ul>
+<li>如果给定节点是一个 <code>FunctionDeclaration</code> 或者 <code>FunctionExpression</code>, 返回给参数传递的参数以及函数的 <code>name</code> 属性的值.</li>
+</ul>
+</li>
+<li><ul>
+<li>如果给定节点是一个 <code>ArrowFunctionExpression</code>, 会返回传递给这个函数的参数.</li>
+</ul>
+</li>
+<li><ul>
+<li>如果给定节点是 <code>ClassDeclaration</code> 或者 <code>ClassDeclaration</code>, 返回类的 name 属性的值.</li>
+</ul>
+</li>
+<li><ul>
+<li>如果给定节点是 <code>CatchClause</code>, 返回异常处理函数里的变量.</li>
+</ul>
+</li>
+<li><ul>
+<li>如果给定节点是 <code>ImportDeclaration</code>, 返回这个语句定义的变量.</li>
+</ul>
+</li>
+<li><ul>
+<li>如果给定节点是 <code>ImportSpecifier</code>, <code>ImportDefaultSpecifier</code> 或者 <code>ImportNamespaceSpecifier</code>, 返回定义的变量.</li>
+</ul>
+</li>
+<li><ul>
+<li>否则, 给定节点什么变量都没有定义的话, 会返回一个空数组.</li>
+</ul>
+</li>
+<li><code>getFilename()</code> - 返回源文件的名称.</li>
+<li><code>getScope()</code> - 返回给定节点的<a href="https://eslint.org/docs/developer-guide/scope-manager-interface" target="_blank" rel="noopener">作用域</a>. 作用域的信息可以用来跟踪变量.</li>
+<li><code>getSourceCode()</code> - 返回基于源文件处理好的, 可以让 ESLint 进行工作的一个源文件对象.</li>
+<li><code>markVariableAsUsed(name)</code> - 把给定的作用域中的一个变量标记为已使用过. 这个会影响<a href="https://eslint.org/docs/rules/no-unused-vars" target="_blank" rel="noopener">no-unused-vars</a>规则. 如果这个变量在被标记以前的状态已经是被使用过了, 就返回 <code>true</code>, 否则返回 <code>false</code>.</li>
+<li><code>report(descriptor)</code> - 报告代码中存在的问题 (点<a href="https://eslint.org/docs/developer-guide/working-with-rules#contextreport" target="_blank" rel="noopener">这里</a>看对应的部分).</li>
+</ul>
+<p><strong>注意:</strong> 在 ESLint 的早期版本, <code>context</code> 对象还支持额外的一些方法. 这些方法都已经在新的格式里被移除了, 并且不应该再被依赖了.</p>
+<h3 id="context-report"><a href="#context-report" class="headerlink" title="context.report()"></a>context.report()</h3><p>写自定义规则的过程里, 最常用的一个方法是 <code>context.report()</code>, 这个方法可以报告一个 warning 或者 error(取决于你的配置文件怎么用的). 这个方法只接受一个对象作为参数, 这个对象, 包含如下的字段:</p>
+<ul>
+<li><code>message</code> - 问题的描述.</li>
+<li><code>node</code> - (可选) 与问题相关的 AST. 如果这个选项和 <code>loc</code> 都没有被指定, 这个节点的开始的地方, 就会被被当作问题的定位.</li>
+<li><code>loc</code> - (可选) 一个表示问题定位信息的对象. 如果 <code>loc</code> 和 <code>node</code> 都被指定了, ESLint 会用 <code>loc</code> 参数来定位问题, 而不是 <code>node</code>.</li>
+<li><ul>
+<li><code>start</code> - 一个对象, 定位了问题从哪里开始.</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><code>line</code> - 从 1 开始数的行数, 用于表示问题在第几行开始发生.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><code>column</code> - 从 0 开始数的列数, 用于表示问题在第几列开始发生.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><code>end</code> - 一个对象, 定位了问题在哪里结束.</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><code>line</code> - 从 1 开始数的行数, 用于表示问题在第几行结束.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><code>column</code> - 从 0 开始数的列数, 用于表示问题在第几列开始结束.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>data</code> - (可选) 错误信息的<a href="https://eslint.org/docs/developer-guide/working-with-rules#using-message-placeholders" target="_blank" rel="noopener">占位符</a>数据.</li>
+<li><code>fix</code> - (可选) 一个可以用来纠正问题的函数.<br>注意, 参数里, <code>node</code> 与 <code>loc</code> 至少需要配置一个.</li>
+</ul>
+<p>最简单的报错的例子就是直接用 <code>node</code> 和 <code>message</code>:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">context.report(&#123;</span><br><span class="line">    node: node,</span><br><span class="line">    message: <span class="string">"Unexpected identifier"</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>node 变量包括了查错所需要的必要信息, 包括行列信息, 还有简单的源代码的文本.</p>
+<h3 id="用-message-占位符"><a href="#用-message-占位符" class="headerlink" title="用 message 占位符"></a>用 message 占位符</h3><p>你也可以用占位符:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">context.report(&#123;</span><br><span class="line">    node: node,</span><br><span class="line">    message: <span class="string">"Unexpected identifier: &#123;&#123; identifier &#125;&#125;"</span>,</span><br><span class="line">    data: &#123;</span><br><span class="line">        identifier: node.name</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>注意 message 里变量前后的空格是可选的.</p>
+<p>node 里包含的信息, 同上.</p>
+<h3 id="messageIds"><a href="#messageIds" class="headerlink" title="messageIds"></a><code>messageId</code>s</h3><p>你可以在 <code>context.report()</code> 和测试文件里都打出报告信息, 也可以用一个 <code>messageIds</code> 来代替.</p>
+<p>这样你就能避免重复打印信息了. It also prevents errors reported in different sections of your rule from having out-of-date messages.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// in your rule</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    meta: &#123;</span><br><span class="line">        messages: &#123;</span><br><span class="line">            avoidName: <span class="string">"Avoid using variables named '&#123;&#123; name &#125;&#125;'"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    create(context) &#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            Identifier(node) &#123;</span><br><span class="line">                <span class="keyword">if</span> (node.name === <span class="string">"foo"</span>) &#123;</span><br><span class="line">                    context.report(&#123;</span><br><span class="line">                        node,</span><br><span class="line">                        messageId: <span class="string">"avoidName"</span>,</span><br><span class="line">                        data: &#123;</span><br><span class="line">                            name: <span class="string">"foo"</span>,</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// in the file to lint:</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> foo = <span class="number">2</span>;</span><br><span class="line"><span class="comment">//  ^ error: Avoid using variables named 'foo'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// In your tests:</span></span><br><span class="line"><span class="keyword">var</span> rule = <span class="built_in">require</span>(<span class="string">"../../../lib/rules/my-rule"</span>);</span><br><span class="line"><span class="keyword">var</span> RuleTester = <span class="built_in">require</span>(<span class="string">"eslint"</span>).RuleTester;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> ruleTester = <span class="keyword">new</span> RuleTester();</span><br><span class="line">ruleTester.run(<span class="string">"my-rule"</span>, rule, &#123;</span><br><span class="line">    valid: [<span class="string">"bar"</span>, <span class="string">"baz"</span>],</span><br><span class="line"></span><br><span class="line">    invalid: [</span><br><span class="line">        &#123;</span><br><span class="line">            code: <span class="string">"foo"</span>,</span><br><span class="line">            errors: [</span><br><span class="line">                &#123;</span><br><span class="line">                    messageId: <span class="string">"avoidName"</span>,</span><br><span class="line">                    data: &#123;</span><br><span class="line">                        name: <span class="string">"foo"</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="进行修正"><a href="#进行修正" class="headerlink" title="进行修正"></a>进行修正</h3><p>如果你想让 ESLint 在发现报告问题的时候, 尝试自动修正问题, 可以给 <code>context.report()</code> 指定一个 <code>fix</code> 函数. <code>fix</code> 函数接受一个用来修正的 <code>fixer</code> 对象作为参数, 用来修正问题. 比如:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">context.report(&#123;</span><br><span class="line">    node: node,</span><br><span class="line">    message: <span class="string">"Missing semicolon"</span>,</span><br><span class="line">    fix: <span class="function"><span class="keyword">function</span>(<span class="params">fixer</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> fixer.insertTextAfter(node, <span class="string">";"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>这个 <code>fix()</code> 函数可以在给定节点后面插入一个分号. 要注意的是, 修正不是立即就进行的, 而且如果跟其他的修正函数有冲突的话, 这个修正可能不会进行. 在修正完以后, ESLint 会在修正完的代码上重新运行所有启用的校验规则, 所以可能会引发更多的修正. 在所有能被修正的问题都被修正完以前, 这个过程最多会重复 10 次. 在这以后, 问题会和平常一样被报告出来, 而不会自动修正.</p>
+<p>Important: Unless the rule exports the meta.fixable property, ESLint does not apply fixes even if the rule implements fix functions.</p>
+<p><strong>重要:</strong> 即便实现了 <code>fix</code> 函数, ESLint 也不会启用修正功能, 除非规则 <a href="https://eslint.org/docs/developer-guide/working-with-rules#rule-basics" target="_blank" rel="noopener">exports</a> 了 <code>meta.fixable</code> 字段.</p>
+<p><code>fixer</code> 对象包含以下方法:</p>
+<ul>
+<li><code>insertTextAfter(nodeOrToken, text)</code> - 在给定节点或者 token 后, 插入文本</li>
+<li><code>insertTextAfterRange(range, text)</code> - 在给定的 range 后插入文本</li>
+<li><code>insertTextBefore(nodeOrToken, text)</code> - 在给定节点或者 token 前, 插入文本</li>
+<li><code>insertTextBeforeRange(range, text)</code> - 在给定的 range 前插入文本</li>
+<li><code>remove(nodeOrToken)</code> - 移除给定节点或者 token</li>
+<li><code>removeRange(range)</code> - 在指定节点或者 token 中, 移除给定文本</li>
+<li><code>replaceText(nodeOrToken, text)</code> - 替换给定节点或者 token 中的文本</li>
+<li><code>replaceTextRange(range, text)</code> - 替换给定 range 中的文本</li>
+</ul>
+<p>上面这些方法返回了一个 <code>fixing</code> 对象. <code>fix()</code> 函数可以返回如下值:</p>
+<ul>
+<li>一个 <code>fixing</code> 对象.</li>
+<li>一个包含了 <code>fixing</code> 对象的数组.</li>
+<li>一个可迭代枚举 <code>fixing</code> 对象的对象. 也就是说, <code>fix()</code> 对象可以是一个生成器.</li>
+</ul>
+<p>如果你让 <code>fix()</code> 函数返回了多个 <code>fixing</code> 对象, 这些 <code>fixing</code> 对象不能是重复的.</p>
+<p>有关修正的最佳实践:</p>
+<ol>
+<li>避免任何能改变运行时行为的修正, 以避免代码停止运行.</li>
+<li>作尽可能小范围的修正. 如果有些修正不必要的繁杂, 可能会导致跟其他的修正冲突, 于是这个修正就不会被应用了.</li>
+<li>每个 message 只做一个修正. 这个是强制的, 因为在每个 <code>fix()</code> 函数执行完以后, 你都需要返回修正操作的结果.</li>
+<li>既然在每次修复完成后, 都会重新运行所有的规则进行校验, 那在修正完成后, 就没有单独检查修正是否引起了新的错误的必要了.<ul>
+<li><ul>
+<li>比如, 假设修正函数想让一个对象的键被引号包裹起来, 但是这个修正函数并不知道用户的脚本是用单引号还是双引号格式化的.<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(&#123; <span class="attr">foo</span> : <span class="number">1</span> &#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// should get fixed to either</span></span><br><span class="line"></span><br><span class="line">(&#123; <span class="string">'foo'</span>: <span class="number">1</span> &#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// or</span></span><br><span class="line"></span><br><span class="line">(&#123; <span class="string">"foo"</span>: <span class="number">1</span> &#125;)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><ul>
+<li>这个修正函数选择的可能是单引号或者双引号里的其中一个. 如果猜错了, 修正后的代码会报引号相关的问题, 并且可以被 <a href="https://eslint.org/docs/rules/quotes" target="_blank" rel="noopener"><code>quotes</code></a> 规则自动修正.</li>
+</ul>
+</li>
+</ul>
+<h3 id="context-options"><a href="#context-options" class="headerlink" title="context.options"></a>context.options</h3><p>有些规则为了正常的工作, 需要配置选项. 这些选项会出现在配置信息里(<code>.eslintrc</code>, 命令行, 后者注释中). 比如:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">"quotes"</span>: [<span class="string">"error"</span>, <span class="string">"double"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>quotes</code> 规则在这个例子里有一个选项, <code>&quot;double&quot;</code>(<code>error</code> 是错误级别). 在写修正函数的时候, 可以用<code>context.options</code> 这个属性来得到一个这个规则的配置信息的数组. 在这个例子里, 访问 <code>context.options[0]</code> 会得到 <code>&quot;double&quot;</code>:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    create: <span class="function"><span class="keyword">function</span>(<span class="params">context</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> isDouble = (context.options[<span class="number">0</span>] === <span class="string">"double"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>由于<code>context.options</code>刚好是一个数组, 你在拿到配置信息的时候, 可以直接得到到底有多少条配置被应用在这个规则上. 记住, 错误级别不属于 <code>context.options</code>, 错误级别在一个规则里也是不可以被获取或者被修改的.</p>
+<p>当你的代码要读取配置信息的时候, 确保设置好了一些默认值, 以防使用这个规则的人没有传递任何配置信息.</p>
+<h3 id="context-getSourceCode"><a href="#context-getSourceCode" class="headerlink" title="context.getSourceCode()"></a>context.getSourceCode()</h3><p>如果你想要得到跟你正在 lint 的源代码的更多相关信息, 需要访问 <code>SourceCode</code> 这个对象. 通过调用 <code>getSourceCode()</code> 方法, 你可以随时获得 <code>SourceCode</code> 这个对象:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    create: <span class="function"><span class="keyword">function</span>(<span class="params">context</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> sourceCode = context.getSourceCode();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>一旦拿到了 <code>SourceCode</code> 的实例, 就可以调用这个对象上的方法来操作代码了:</p>
+<ul>
+<li><code>getText(node)</code> - 返回给定节点的源代码. 如果不传递 <code>node</code> 参数, 会得到整份源代码.</li>
+<li><code>getAllComments()</code> - 返回一个包含源代码中所有注释的数组.</li>
+<li><code>getCommentsBefore(nodeOrToken)</code> - returns an array of comment tokens that occur directly before the given node or token.</li>
+<li><code>getCommentsAfter(nodeOrToken)</code> - returns an array of comment tokens that occur directly after the given node or token.</li>
+<li><code>getCommentsInside(node)</code> - 返回给定节点中的所有注释.</li>
+<li><code>getJSDocComment(node)</code> - 返回给定节点中的 JSDoc 注释节点, 如果没有的话, 就返回 <code>null</code>.</li>
+<li><code>isSpaceBetweenTokens(first, second)</code> - 如果在给定的两个节点之间有空格, 返回 <code>true</code>.</li>
+<li><code>getFirstToken(node, skipOptions)</code> - 返回给定节点中包含的第一个分词.</li>
+<li><code>getFirstTokens(node, countOptions)</code> - returns the first count tokens representing the given node.</li>
+<li><code>getLastToken(node, skipOptions)</code> - 返回给定节点里的最后一个分词.</li>
+<li><code>getLastTokens(node, countOptions)</code> - returns the last count tokens representing the given node.</li>
+<li><code>getTokenAfter(nodeOrToken, skipOptions)</code> - 返回给定节点或者分词后的第一个分词.</li>
+<li><code>getTokensAfter(nodeOrToken, countOptions)</code> - returns count tokens after the given node or token.</li>
+<li><code>getTokenBefore(nodeOrToken, skipOptions)</code> - 返回给定节点或者分词前的第一个分词.</li>
+<li><code>getTokensBefore(nodeOrToken, countOptions)</code> - returns count tokens before the given node or token.</li>
+<li><code>getFirstTokenBetween(nodeOrToken1, nodeOrToken2, skipOptions)</code> - 返回两个给定节点或者分词间的第一个分词.</li>
+<li><code>getFirstTokensBetween(nodeOrToken1, nodeOrToken2, countOptions)</code> - returns the first count tokens between two nodes or tokens.</li>
+<li><code>getLastTokenBetween(nodeOrToken1, nodeOrToken2, skipOptions)</code> - 返回两个给定节点或者分词间的最后一个分词.</li>
+<li><code>getLastTokensBetween(nodeOrToken1, nodeOrToken2, countOptions)</code> - returns the last count tokens between two nodes or tokens.</li>
+<li><code>getTokens(node)</code> - 返回给定节点的所有分词.</li>
+<li><code>getTokensBetween(nodeOrToken1, nodeOrToken2)</code> - 返回两个给定节点间的所有分词.</li>
+<li><code>getTokenByRangeStart(index, rangeOptions)</code> - 返回以给定索引为开始的所有分词.</li>
+<li><code>getNodeByRangeIndex(index)</code> - 返回包含给定源代码索引的层次最深的一个节点.</li>
+<li><code>getLocFromIndex(index)</code> - 返回给定源代码索引的坐标信息, 包含以 1 开始的行坐标 <code>line</code>与以 0 开始的列坐标 <code>column</code>.</li>
+<li><code>getIndexFromLoc(loc)</code> - 返回给定坐标定位到的源代码的坐标对象, <code>loc</code> 是一个坐标对象, 其包含以 1 开始的行坐标 <code>line</code> 与以 0 开始的列坐标 <code>column</code>.</li>
+<li><code>commentsExistBetween(nodeOrToken1, nodeOrToken2)</code> - 如果给定节点或分词间, 存在注释, 返回 <code>true</code>.</li>
+</ul>
+<blockquote>
+<p><code>skipOptions</code> 是一个有 3 个字段的对象, 包括 <code>skip</code>, <code>includeComments</code> 和 <code>filter</code>. 默认值为 <code>{skip: 0, includeComments: false, filter: null}</code>.</p>
+<ul>
+<li><code>skip</code> 是一个正整数, 表示跳过的分词的数量. 如果 <code>filter</code> 参数也有数值, 那么 <code>filter</code> 过滤掉的分词不会被计数在需要跳过的分词里.</li>
+<li><code>includeComments</code> 是一个布尔值, 是一个标志位, 用来标记返回结果里要不要出现注释分词.</li>
+<li><code>filter</code> 是一个第一个参数为分词的函数, 如果函数返回 <code>false</code>, 那么结果里就会排除掉这个分词.</li>
+</ul>
+<p><code>countOptions</code> 是一个拥有 3 个字段的对象; <code>count</code>, <code>includeComments</code>, 以及 <code>filter</code>. 默认值是 <code>{count: 0, includeComments: false, filter: null}</code>.</p>
+<ul>
+<li><code>count</code> 是一个正整数, 值为返回的所有分词的数量.</li>
+<li><code>includeComments</code> 是一个布尔值, 是一个标志位, 用来标记返回结果里要不要出现注释分词.</li>
+<li><code>filter</code> 是一个第一个参数为分词的函数, 如果函数返回 <code>false</code>, 那么结果里就会排除掉这个分词.<br><code>rangeOptions</code> 是包含一个字段的对象: <code>includeComments</code>.</li>
+<li><code>includeComments</code> 是一个布尔值, 是一个标志位, 用来标记返回结果里要不要出现注释分词.</li>
+</ul>
+</blockquote>
+<p>还有一些别的你可以访问的字段：</p>
+<ul>
+<li><code>hasBOM</code> - 用来表示源代码是否含有 Unicode BOM 头</li>
+<li><code>text</code> - 需要被 lint 的完整的文本. Unicode BOM 头已经被去掉了.</li>
+<li><code>ast</code> - 需要被 lint 的代码的 AST.</li>
+<li><code>scopeManager</code> - 代码的<a href="https://eslint.org/docs/developer-guide/scope-manager-interface" target="_blank" rel="noopener">作用域管理</a>对象.</li>
+<li><code>visitorKeys</code> - 用于遍历这个 AST 的访问者 key.</li>
+<li><code>lines</code> - 代码分成行的数组, 分行是根据指定的换行符来进行的.</li>
+</ul>
+<p>通过 <code>SourceCode</code> 对象, 你可以获得更多有关你要 lint 的代码的信息.</p>
+<h4 id="Deprecated"><a href="#Deprecated" class="headerlink" title="Deprecated"></a>Deprecated</h4><p>下列这些方法已经被废弃了, 并且在未来的版本里, 会从 ESLint 中移除掉:</p>
+<ul>
+<li><code>getComments()</code> - 被 <code>getCommentsBefore()</code>, <code>getCommentsAfter()</code>, 以及 <code>getCommentsInside()</code> 方法取代了</li>
+<li><code>getTokenOrCommentBefore()</code> - 被带有 <code>{ includeComments: true }</code> 参数的 <code>getTokenBefore()</code> 方法取代了</li>
+<li><code>getTokenOrCommentAfter()</code> - 被带有 <code>{ includeComments: true }</code> 参数的 <code>getTokenAfter()</code> 方法取代了</li>
+</ul>
+<h3 id="参数纲要"><a href="#参数纲要" class="headerlink" title="参数纲要"></a>参数纲要</h3><p>自定义的规则可能导出 <code>schema</code> 字段, 这个字段是一个<a href="http://json-schema.org/" target="_blank" rel="noopener">基于 JSON 格式的 schema</a> 描述, 这个 schema 会被用于校验用户提供给 ESLint 的参数的有效性, 避免用户给 <code>context.options</code> 传递一些无效或者异常的输入.</p>
+<p>有两种导出 <code>schema</code> 的方式. 第一种是, 导出完整的 JSON schema 对象, 这个对象枚举了所有可能的规则参数的情况, 包括了错误级别(error level)第一个参数, 后面再加上几个额外的参数的情况.</p>
+<p>然而, 为了简化 schema 的编写, 规则也可以在可选参数的后面跟上一个表示可以作为参数值的数组, ESLint 会首先对需要的错误级别进行校验. 比如, <code>yoda</code> 规则接收主要参数, 以及带有命名好的字段的额外的参数对象.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// "yoda": [2, "never", &#123; "exceptRange": true &#125;]</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    meta: &#123;</span><br><span class="line">        schema: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"enum"</span>: [<span class="string">"always"</span>, <span class="string">"never"</span>]</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"type"</span>: <span class="string">"object"</span>,</span><br><span class="line">                <span class="string">"properties"</span>: &#123;</span><br><span class="line">                    <span class="string">"exceptRange"</span>: &#123;</span><br><span class="line">                        <span class="string">"type"</span>: <span class="string">"boolean"</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">"additionalProperties"</span>: <span class="literal">false</span></span><br><span class="line">            &#125;</span><br><span class="line">        ];</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>在上面这个例子里, 错误级别被假定为了第一个参数. 紧随其后的, 是第一个可选参数, 参数的值可能是 <code>&quot;always&quot;</code> 或者 <code>&quot;never&quot;</code>. 最后跟着的是一个对象形式的可选的参数, 这个对象表示的是, 这个参数名为 <code>exceptRange</code>, 值为布尔型.</p>
+<p>为了进一步了解 JSON schema, 我们建议你先从看一些<a href="http://json-schema.org/examples.html" target="_blank" rel="noopener">例子</a>开始, 并且读一下 <a href="http://spacetelescope.github.io/understanding-json-schema/" target="_blank" rel="noopener">Understanding JSON Schema</a> 这本书(免费的).</p>
+<p><strong>Note:</strong> 目前你需要使用完整的 JSON Schema 对象而不是数组, 以免你的 schema 里含有引用($ref), 因为在这种情况下, ESLint 会把数组转换为单个的 schema 而不更新引用, 结果就会导致出错(引用会被忽略掉).</p>
+<h3 id="得到源码"><a href="#得到源码" class="headerlink" title="得到源码"></a>得到源码</h3><p>如果你需要对 JavaScript 源代码进行操作, 可以调用 <code>sourceCode.getText()</code> 来得到源代码. 这个方法的工作方式如下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// get all source</span></span><br><span class="line"><span class="keyword">var</span> source = sourceCode.getText();</span><br><span class="line"></span><br><span class="line"><span class="comment">// get source for just this AST node</span></span><br><span class="line"><span class="keyword">var</span> nodeSource = sourceCode.getText(node);</span><br><span class="line"></span><br><span class="line"><span class="comment">// get source for AST node plus previous two characters</span></span><br><span class="line"><span class="keyword">var</span> nodeSourceWithPrev = sourceCode.getText(node, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// get source for AST node plus following two characters</span></span><br><span class="line"><span class="keyword">var</span> nodeSourceWithFollowing = sourceCode.getText(node, <span class="number">0</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure></p>
+<p>如果 AST 没能提供正确的数据的话(比如逗号、分号、圆括号的定位信息等等), 你就可以直接对 JavaScript 文本进行操作来得到这些.</p>
+<h3 id="访问注释"><a href="#访问注释" class="headerlink" title="访问注释"></a>访问注释</h3><p>因为注释在技术层面上来讲, 并不属于 AST 的一部分, 所以 ESlint 提供了一些访问注释的方法:</p>
+<p>sourceCode.getAllComments()<br>这个方法返回一个数组, 数组里包含了从程序里找到的那些注释. 当开发者不关心注释的定位信息, 而是需要查看一下所有的注释的时候, 这个方法尤为有用.</p>
+<p>sourceCode.getCommentsBefore(), sourceCode.getCommentsAfter(), and sourceCode.getCommentsInside()<br>这些方法依次返回在给定节点之前、之后以及节点内部的注释. 当开发者想要查看跟给定节点或者分词相关的注释的时候, 这个方法尤为有用.</p>
+<p>记住, 这些方法的结果是需要经过计算才能得到的.</p>
+<h4 id="遍历分词的方法"><a href="#遍历分词的方法" class="headerlink" title="遍历分词的方法"></a>遍历分词的方法</h4><p>其实, 注释也可以通过很多的 <code>sourceCode</code> 对象的方法, 加上 <code>includeCommecnts</code> 参数来调用, 来进行访问.</p>
+<h3 id="访问-Shebangs"><a href="#访问-Shebangs" class="headerlink" title="访问 Shebangs"></a>访问 Shebangs</h3><p>Shebangs 是类型为 <code>&quot;Shebang&quot;</code> 的分词. 其会被上面提到的这些方法, 当作注释来识别.</p>
+<h3 id="访问代码路径"><a href="#访问代码路径" class="headerlink" title="访问代码路径"></a>访问代码路径</h3><p>ESLint 在遍历 AST 的时候会分析代码路径. 你可以通过跟代码路径相关的 5 个事件, 来访问代码路径.<br><a href="https://eslint.org/docs/developer-guide/code-path-analysis" target="_blank" rel="noopener">细节看这里</a></p>
+<h2 id="对规则单元测试"><a href="#对规则单元测试" class="headerlink" title="对规则单元测试"></a>对规则单元测试</h2><p>在提交 ESLint 的核心规则的时候, 为了被 ESLint 库接受, 必须对每个规则增加一系列的单测文件. 单测文件跟规则的源文件同名, 不过放在 <code>tests/lib/</code> 文件夹下. 比如, 如果源文件是 <code>lib/rules/foo.js</code>, 那测试文件就是 <code>tests/lib/rules/foo.js</code>.</p>
+<p>ESLint 提供了 <a href="https://eslint.org/docs/developer-guide/nodejs-api" target="_blank" rel="noopener"><code>RuleTester</code></a> 工具让写单测变得更简单.</p>
+<h2 id="性能测试"><a href="#性能测试" class="headerlink" title="性能测试"></a>性能测试</h2><p>为了保持 lint 进程的高效性, 以及对开发者造成尽可能小的影响, 测试一下新规则以及对现有规则的修改对性能的影响, 是很有用的.</p>
+<h3 id="总体性能"><a href="#总体性能" class="headerlink" title="总体性能"></a>总体性能</h3><p>当开发 ESLint 核心库的时候, <code>npm run perf</code> 命令会显示出来所有规则都执行的时候, 运行所需时间的概括情况.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout master</span><br><span class="line">Switched to branch <span class="string">'master'</span></span><br><span class="line"></span><br><span class="line">$ npm run perf</span><br><span class="line">CPU Speed is 2200 with multiplier 7500000</span><br><span class="line">Performance Run <span class="comment">#1:  1394.689313ms</span></span><br><span class="line">Performance Run <span class="comment">#2:  1423.295351ms</span></span><br><span class="line">Performance Run <span class="comment">#3:  1385.09515ms</span></span><br><span class="line">Performance Run <span class="comment">#4:  1382.406982ms</span></span><br><span class="line">Performance Run <span class="comment">#5:  1409.68566ms</span></span><br><span class="line">Performance budget ok:  1394.689313ms (<span class="built_in">limit</span>: 3409.090909090909ms)</span><br><span class="line"></span><br><span class="line">$ git checkout my-rule-branch</span><br><span class="line">Switched to branch <span class="string">'my-rule-branch'</span></span><br><span class="line"></span><br><span class="line">$ npm run perf</span><br><span class="line">CPU Speed is 2200 with multiplier 7500000</span><br><span class="line">Performance Run <span class="comment">#1:  1443.736547ms</span></span><br><span class="line">Performance Run <span class="comment">#2:  1419.193291ms</span></span><br><span class="line">Performance Run <span class="comment">#3:  1436.018228ms</span></span><br><span class="line">Performance Run <span class="comment">#4:  1473.605485ms</span></span><br><span class="line">Performance Run <span class="comment">#5:  1457.455283ms</span></span><br><span class="line">Performance budget ok:  1443.736547ms (<span class="built_in">limit</span>: 3409.090909090909ms)</span><br></pre></td></tr></table></figure></p>
+<h3 id="单个规则的性能"><a href="#单个规则的性能" class="headerlink" title="单个规则的性能"></a>单个规则的性能</h3><p>ESLint 有一个内置的方法来对单个的规则的性能进行跟踪. 设置一下 <code>TIMING</code> 环境变量, 就会触发跟踪结果的显示, 这些内容收集了耗时最长的十个规则里, 每个规则单独的耗时, 并且通过计算占总的规则的时间的百分比, 来标示出对性能的影响的相关性.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ TIMING=1 eslint lib</span><br><span class="line">Rule                    | Time (ms) | Relative</span><br><span class="line">:-----------------------|----------:|--------:</span><br><span class="line">no-multi-spaces         |    52.472 |     6.1%</span><br><span class="line">camelcase               |    48.684 |     5.7%</span><br><span class="line">no-irregular-whitespace |    43.847 |     5.1%</span><br><span class="line">valid-jsdoc             |    40.346 |     4.7%</span><br><span class="line">handle-callback-err     |    39.153 |     4.6%</span><br><span class="line">space-infix-ops         |    35.444 |     4.1%</span><br><span class="line">no-undefined            |    25.693 |     3.0%</span><br><span class="line">no-shadow               |    22.759 |     2.7%</span><br><span class="line">no-empty-class          |    21.976 |     2.6%</span><br><span class="line">semi                    |    19.359 |     2.3%</span><br></pre></td></tr></table></figure></p>
+<p>如果想要明确的测试某个规则, 可以对命令加上 <code>--no-eslintrc</code> 和 <code>--rule</code> 参数:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ TIMING=1 eslint --no-eslintrc --rule <span class="string">"quotes: [2, 'double']"</span> lib</span><br><span class="line">Rule   | Time (ms) | Relative</span><br><span class="line">:------|----------:|--------:</span><br><span class="line">quotes |    18.066 |   100.0%</span><br></pre></td></tr></table></figure></p>
+<h2 id="规则命名约定"><a href="#规则命名约定" class="headerlink" title="规则命名约定"></a>规则命名约定</h2><p>ESLint 的规则命名约定, 是相当简单的:</p>
+<ul>
+<li>如果你的规则是为了禁用某些东西, 请用 <code>no-</code> 作为前缀, 比如 <code>no-eval</code> 表示禁止使用 <code>eval()</code>, <code>no-debugger</code> 表示禁止使用 <code>debugger</code>.</li>
+<li>如果你的规则是为了强制要求包含某些东西, 不要加前缀, 只要用简写来命名就行了.</li>
+<li>在单词之间用短破折号(-).</li>
+</ul>
+<h2 id="运行时规则"><a href="#运行时规则" class="headerlink" title="运行时规则"></a>运行时规则</h2><p>之所以 ESLint 独一无二, 是因为 ESLint 能够自定义运行时规则. 当你需要给你自己的项目或者公司制定某个规则, 但是有不需要发给 ESLint 官方的仓库的时候, 这个特性就很完美. 有了运行时规则, 你就不需要等下个版本的 ESLint 了, 或者因为你自己写的规则并不适合发表到大型 JavaScript 社区而感到沮丧, 只管写就是了, 然后在运行时里引入.</p>
+<p>运行时规则写起来和其他格式并无二致. 写的时候就跟写其他规则一样, 写完了以后, 再执行下面这些步骤:</p>
+<ol>
+<li>把你的所有运行时规则都放到同一个目录下(比如, <code>eslint_rules</code>).</li>
+<li>写一个<a href="https://eslint.org/docs/user-guide/configuring" target="_blank" rel="noopener">配置文件</a>, 在 <code>rules</code> 字段里, 表明你的规则 ID 以及对应的错误级别. 你的规则如果想要运行, 需要给 <code>1</code> 或者 <code>2</code> 作为值.</li>
+<li>用<a href="https://eslint.org/docs/user-guide/command-line-interface" target="_blank" rel="noopener">命令行(CLI)</a>加上 <code>--rulesdir</code> 参数, 来指定你的运行时规则所在的文件夹.</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/18/ui-test-with-jest-and-puppeteer/" rel="next" title="教程：用 Jest 与 Puppeteer 进行 UI test">
+                <i class="fa fa-chevron-left"></i> 教程：用 Jest 与 Puppeteer 进行 UI test
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/23/CURL-系列-8-3-——-HTTP-认证/" rel="prev" title="CURL 系列(8.3) —— HTTP 认证">
+                CURL 系列(8.3) —— HTTP 认证 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">olaf cheng</p>
+              <p class="site-description motion-element" itemprop="description">纸上得来终觉浅，绝知此事要躬行。</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#规则基础"><span class="nav-number">1.</span> <span class="nav-text">规则基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上下文-Object"><span class="nav-number">2.</span> <span class="nav-text">上下文 Object</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#context-report"><span class="nav-number">2.1.</span> <span class="nav-text">context.report()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用-message-占位符"><span class="nav-number">2.2.</span> <span class="nav-text">用 message 占位符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#messageIds"><span class="nav-number">2.3.</span> <span class="nav-text">messageIds</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进行修正"><span class="nav-number">2.4.</span> <span class="nav-text">进行修正</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#context-options"><span class="nav-number">2.5.</span> <span class="nav-text">context.options</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#context-getSourceCode"><span class="nav-number">2.6.</span> <span class="nav-text">context.getSourceCode()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Deprecated"><span class="nav-number">2.6.1.</span> <span class="nav-text">Deprecated</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参数纲要"><span class="nav-number">2.7.</span> <span class="nav-text">参数纲要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#得到源码"><span class="nav-number">2.8.</span> <span class="nav-text">得到源码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问注释"><span class="nav-number">2.9.</span> <span class="nav-text">访问注释</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#遍历分词的方法"><span class="nav-number">2.9.1.</span> <span class="nav-text">遍历分词的方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问-Shebangs"><span class="nav-number">2.10.</span> <span class="nav-text">访问 Shebangs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问代码路径"><span class="nav-number">2.11.</span> <span class="nav-text">访问代码路径</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对规则单元测试"><span class="nav-number">3.</span> <span class="nav-text">对规则单元测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能测试"><span class="nav-number">4.</span> <span class="nav-text">性能测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#总体性能"><span class="nav-number">4.1.</span> <span class="nav-text">总体性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单个规则的性能"><span class="nav-number">4.2.</span> <span class="nav-text">单个规则的性能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#规则命名约定"><span class="nav-number">5.</span> <span class="nav-text">规则命名约定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行时规则"><span class="nav-number">6.</span> <span class="nav-text">运行时规则</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">olaf cheng</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

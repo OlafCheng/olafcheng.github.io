@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-cn">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="CURL 系列(8.3) —— HTTP 认证原文: Authentication · Everything curl - HTTP authentication 每个 HTTP 请求, 都可以被认证. 如果一个服务器或者一个代理想要让用户证明自己有权限去访问某个 URL 或者执行某个操作, 它可以返回一个 HTTP 请求, 让客户端提供一个包含了正确的 HTTP 认证头的请求, 以便认证和允许访">
+<meta name="keywords" content="curl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CURL 系列(8.3) —— HTTP 认证">
+<meta property="og:url" content="https://olafcheng.github.io/2018/09/23/CURL-系列-8-3-——-HTTP-认证/index.html">
+<meta property="og:site_name" content="olaf&#39;s site">
+<meta property="og:description" content="CURL 系列(8.3) —— HTTP 认证原文: Authentication · Everything curl - HTTP authentication 每个 HTTP 请求, 都可以被认证. 如果一个服务器或者一个代理想要让用户证明自己有权限去访问某个 URL 或者执行某个操作, 它可以返回一个 HTTP 请求, 让客户端提供一个包含了正确的 HTTP 认证头的请求, 以便认证和允许访">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2018-09-23T11:27:29.465Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CURL 系列(8.3) —— HTTP 认证">
+<meta name="twitter:description" content="CURL 系列(8.3) —— HTTP 认证原文: Authentication · Everything curl - HTTP authentication 每个 HTTP 请求, 都可以被认证. 如果一个服务器或者一个代理想要让用户证明自己有权限去访问某个 URL 或者执行某个操作, 它可以返回一个 HTTP 请求, 让客户端提供一个包含了正确的 HTTP 认证头的请求, 以便认证和允许访">
+
+
+
+
+
+
+  <link rel="canonical" href="https://olafcheng.github.io/2018/09/23/CURL-系列-8-3-——-HTTP-认证/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>CURL 系列(8.3) —— HTTP 认证 | olaf's site</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">olaf's site</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://olafcheng.github.io/2018/09/23/CURL-系列-8-3-——-HTTP-认证/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="olaf cheng">
+      <meta itemprop="description" content="纸上得来终觉浅，绝知此事要躬行。">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="olaf's site">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CURL 系列(8.3) —— HTTP 认证
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-09-23 19:23:20 / Modified: 19:27:29" itemprop="dateCreated datePublished" datetime="2018-09-23T19:23:20+08:00">2018-09-23</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="CURL-系列-8-3-——-HTTP-认证"><a href="#CURL-系列-8-3-——-HTTP-认证" class="headerlink" title="CURL 系列(8.3) —— HTTP 认证"></a>CURL 系列(8.3) —— HTTP 认证</h1><p>原文: <a href="https://ec.haxx.se/http-auth.html" target="_blank" rel="noopener">Authentication · Everything curl - HTTP authentication</a></p>
+<p>每个 HTTP 请求, 都可以被认证. 如果一个服务器或者一个代理想要让用户证明自己有权限去访问某个 URL 或者执行某个操作, 它可以返回一个 HTTP 请求, 让客户端提供一个包含了正确的 HTTP 认证头的请求, 以便认证和允许访问.</p>
+<p>如果一个服务器需要认证才能进行访问的话, 会返回 401 码, 以及一个 <code>WWW-Authenticate:</code> 头, 这个头里包含了服务器支持的所有类型的认证方式.</p>
+<p>如果一个 HTTP 代理需要认证的话, 会返回 407 码, 以及一个 <code>Proxy-Authenticate:</code> 头, 这个头里包含了代理支持的所有类型的认证方式.</p>
+<p>值得一提的是, 当今的绝大多数网站已经不再需要 HTTP 认证来进行登录等等操作了, 但是取而代之的是, 网站会要求用户在网站的登录页上进行登录, 然后网站会把用户输入的用户名和密码以 POST 请求的方式发送给服务器, 随后客户端只需要维护着 cookie 来维护 session 即可.</p>
+<p>为了让 curl 命令发起一个带有 HTTP 认证的请求, 你需要加上 <code>-u</code>  或者 <code>--user</code> 参数来提供用户名和密码(以冒号分隔). 就像下面这样:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --user daniel:secret http://example.com/</span><br></pre></td></tr></table></figure>
+<p>这样一来， curl 就会以 HTTP 认证中的 “Basic” 方式发起一个认证请求. Basic 方法就像它的名字一样, 真的是一种非常基础的认证. 如果你想非常明确的发出一个 Basic 方法的认证的话, 只需要加上 <code>--basic</code> 参数就可以了.</p>
+<p>Basic 认证方法直接以文本的格式通过网络来发送用户名和密码了（不过是用 base64 编码过了）, 然而这种 HTTP 明文发送用户名和密码的方式, 是应该避免的.</p>
+<p>如果一定要通过 HTTP 传输、单认证方法的方式来进行认证的话, curl 会在第一个 HTTP 请求的头部里加上认证信息.</p>
+<p>如果你想让 curl <em>试一下</em> 服务器是否需要认证, 可以给 curl 加上一个 <code>--anyauth</code> 参数. 这样一来, curl 就会先发送一个请求, 看看是否需要认证, 如果需要认证, 再自动地选择服务器所支持的最为安全的方式进行认证:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --anyauth --user daniel:secret http://example.com/</span><br></pre></td></tr></table></figure></p>
+<p>这样的思路在其他类型的可能会需要认证的 HTTP 操作上, 也行得通:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl --proxy-anyauth --proxy-user daniel:secret http://example.com/ \</span><br><span class="line">     --proxy http://proxy.example.com:80/</span><br></pre></td></tr></table></figure></p>
+<p>curl 一般来说会同时支持好几种认证方式(取决于你在用的 curl 是如何实现的), 包括 Digest, Negotiate 和 NTLM. 如果你想用这些方式的话, 可以像这样加上参数来使用:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl --digest --user daniel:secret http://example.com/</span><br><span class="line">curl --negotiate --user daniel:secret http://example.com/</span><br><span class="line">curl --ntlm --user daniel:secret http://example.com/</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/curl/" rel="tag"># curl</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/16/how-to-write-a-custom-eslint-rule/" rel="next" title="如何写编写自定义 ESLint 规则">
+                <i class="fa fa-chevron-left"></i> 如何写编写自定义 ESLint 规则
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">olaf cheng</p>
+              <p class="site-description motion-element" itemprop="description">纸上得来终觉浅，绝知此事要躬行。</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CURL-系列-8-3-——-HTTP-认证"><span class="nav-number">1.</span> <span class="nav-text">CURL 系列(8.3) —— HTTP 认证</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">olaf cheng</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
