@@ -115,7 +115,7 @@
 <meta property="og:site_name" content="olaf&#39;s site">
 <meta property="og:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button.next">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2018-11-18T10:31:07.075Z">
+<meta property="og:updated_time" content="2018-11-18T10:40:39.889Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="olaf&#39;s site">
 <meta name="twitter:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button.next">
@@ -355,7 +355,13 @@
     }
 
     .auto_mode {
+      display: flex;
       margin-top: 3vh;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      justify-items: center;
+      width: 80vw;
     }
 
     .auto_mode label {
@@ -370,8 +376,9 @@
       text-align: center;
     }
 
-    .auto_mode p {
-      font-size: 4vw;
+    p {
+      font-size: 4.9vw;
+      font-weight: bold;
     }
 
     .auto_mode button {
@@ -425,8 +432,8 @@
       <label for="timer">Timer:</label>
       <input type="number">S
       <button class="auto_mode_switcher">OFF</button>
-      <p>The minimum interval is 0.3 s.</p>
     </div>
+    <p>The minimum interval is 0.3 s.</p>
   </div>
   <script>
     const MIN_INTERVAL = 0.3;
