@@ -115,7 +115,7 @@
 <meta property="og:site_name" content="olaf&#39;s site">
 <meta property="og:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button.next">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2018-11-18T10:44:17.001Z">
+<meta property="og:updated_time" content="2018-11-18T10:48:25.470Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="olaf&#39;s site">
 <meta name="twitter:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button.next">
@@ -388,7 +388,8 @@
       color: white;
       width: 23vw;
       margin: 0 2vw;
-      line-height: 5vh;
+      line-height: 6vh;
+      height: 6vh;
       font-size: 6vw;
       font-weight: bold;
     }
@@ -425,13 +426,13 @@
 <body>
   <div class="demo-container">
     <div class="letter-name"></div>
-    <button class="next">NEXT</button>
+    <button class="next">下一个</button>
     <div class="auto_mode">
-      <label for="timer">Timer:</label>
+      <label for="timer">计时器:</label>
       <input type="number">S
-      <button class="auto_mode_switcher">OFF</button>
+      <button class="auto_mode_switcher">关</button>
     </div>
-    <p>The minimum interval is 0.3 s.</p>
+    <p>最短时间间隔为 0.3 秒</p>
   </div>
   <script>
     const MIN_INTERVAL = 0.3;
@@ -458,8 +459,8 @@
     const switcher = document.querySelector('.auto_mode_switcher');
     const input = document.querySelector('input');
     const SWITCHER_STATE = {
-      ON: 'ON',
-      OFF: 'OFF'
+      ON: '开',
+      OFF: '关'
     };
     let currentSwitcherState = SWITCHER_STATE.OFF;
     let timerHandler = null;
