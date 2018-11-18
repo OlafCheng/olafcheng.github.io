@@ -1,0 +1,31 @@
+body {
+  background-color: beige;
+}
+input[type="checkbox"], input[type="radio"] {
+  display: none;
+}
+input[type="checkbox"] + label::before, input[type="radio"] + label::before {
+  display: inline-block;
+  position: relative;
+  top: 4px;
+  height: 17px;
+  width: 17px;
+  content: "";
+  margin-right: 5px;
+  cursor: pointer;
+  background-image: url("../style.png");
+  background-repeat: no-repeat;
+}
+input[type="checkbox"] + label::before {
+  top: 2px;
+  background-position: -23px -31px;
+}
+input[type="checkbox"]:checked + label::before {
+  background-position: -58px -30px;
+}
+input[type="radio"] + label::before {
+  background-position: -23.5px -10.5px;
+}
+input[type="radio"]:checked + label::before {
+  background-position: -58px -9.3px;
+}

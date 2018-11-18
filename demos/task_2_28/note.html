@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-cn">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="事件通过设计模式和 commander 绑定(松耦合)因为 commander 用来直接与 dom 进行绑定会导致核心部分——这个游戏的逻辑，变得难以维护，所以把这部分进行解耦合，分为 commander 与 eventClear eventCleareventClear 对事件进行处理, 每一个 button 事件的点击, 都把自身传给 eventClear    eventClear 根据传进">
+<meta property="og:type" content="website">
+<meta property="og:title" content="olaf&#39;s site">
+<meta property="og:url" content="https://olafcheng.github.io/demos/task_2_28/note.html">
+<meta property="og:site_name" content="olaf&#39;s site">
+<meta property="og:description" content="事件通过设计模式和 commander 绑定(松耦合)因为 commander 用来直接与 dom 进行绑定会导致核心部分——这个游戏的逻辑，变得难以维护，所以把这部分进行解耦合，分为 commander 与 eventClear eventCleareventClear 对事件进行处理, 每一个 button 事件的点击, 都把自身传给 eventClear    eventClear 根据传进">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2017-02-19T14:48:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="olaf&#39;s site">
+<meta name="twitter:description" content="事件通过设计模式和 commander 绑定(松耦合)因为 commander 用来直接与 dom 进行绑定会导致核心部分——这个游戏的逻辑，变得难以维护，所以把这部分进行解耦合，分为 commander 与 eventClear eventCleareventClear 对事件进行处理, 每一个 button 事件的点击, 都把自身传给 eventClear    eventClear 根据传进">
+
+
+
+
+
+
+  <link rel="canonical" href="https://olafcheng.github.io/demos/task_2_28/note.html"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title> | olaf's site</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">olaf's site</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+    
+    
+      
+      
+    
+      
+      
+    
+    
+
+  
+
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+<h1 class="post-title" itemprop="name headline"></h1>
+
+<div class="post-meta">
+  
+  
+
+
+  
+  
+  <ul class="breadcrumb">
+    
+      
+      
+        
+          <li><a href="/demos/">DEMOS</a></li>
+          
+            
+          
+        
+      
+    
+      
+      
+        
+          <li>TASK_2_28</li>
+        
+      
+    
+      
+      
+        
+          <li><a href="/demos/note.html/">NOTE.HTML</a></li>
+          
+            
+          
+        
+      
+    
+  </ul>
+
+
+</div>
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <p>事件通过设计模式和 <code>commander</code> 绑定(松耦合)<br>因为 <code>commander</code> 用来直接与 dom 进行绑定会导致核心部分——这个游戏的逻辑，变得难以维护，所以把这部分进行解耦合，分为 <code>commander</code> 与 eventClear</p>
+<h2 id="eventClear"><a href="#eventClear" class="headerlink" title="eventClear"></a>eventClear</h2><p>eventClear 对事件进行处理, 每一个 button 事件的点击, 都把自身传给 eventClear<br>    eventClear 根据传进来的 button 的 data-ssid-num 以及这个 button 的 value 进行命令的整合, 整合好后发送给 <code>commander</code><br>    eventClear() 只接收一个参数, 即这个按钮本身<br>    如果命令类似 {id: num, command: str} 就直接发送给 <code>commander</code>(不能直接发给 <code>mediator</code> ，因为 <code>commander</code> 还要负责记录令牌情况)<br>    如果命令是让新的飞船起飞, 就 command.addNewSpaceship();</p>
+<h2 id="commander"><a href="#commander" class="headerlink" title="commander"></a>commander</h2><p><code>commander</code> 接受这个命令 <code>{id: num, command: str}</code>;<br>如果再用模块模式调用 commander<br>    有 <code>_leftToken</code> 属性，用来存储飞船的编号以及是否可用的状态<br>    <code>[{id: 1, space: 1}, {id: 2, space: 0}]</code><br>    每次按照顺序从中取牌发放给新的飞船<br>    <code>commander</code> 本身接收到的数据也是<br>    <code>commander</code> 只负责给 <code>mediator</code> 发信<br>    <code>commander</code> 根据接受到的命令进行令牌的更新，然后对 <code>mediator</code> 发出新的信号</p>
+<h2 id="mediator"><a href="#mediator" class="headerlink" title="mediator"></a>mediator</h2><p><code>mediator</code> 读取全局变量 <code>players</code>(用于保存飞船的实例) , GUI 命令块通过这个变量进行宇宙的渲染<br>    <code>behaviors = {}</code>,<br>    <code>addPlayer()</code> 时根据接受到的命令，初始化新的飞船(<code>id</code> 已经加进去), 再将 <code>this</code> 加到 <code>players</code> 中<br>    <code>players</code> 数组中有可能超过 4 个元素，并且其中 <code>id</code> 可能有重复的<br>    <code>removePlayer()</code> 根据接受的命令来对玩家进行移除, 命令格式 <code>id</code>。要注意的是, 命令的发送的成功与失败是对每一艘飞船而言的, 所以对 <code>id</code> 相同的飞船来说, 对指挥官发出的命令的回应情况可能会不同。<br><code>commandReceiver({id: num, command: &quot;addPlayer&quot;})</code>;</p>
+<h2 id="Player"><a href="#Player" class="headerlink" title="Player"></a>Player</h2><p>飞船用构造函数、原型模式的组合来实现，属性私有, 方法从原型链上继承<br>    属性包括：<code>id</code>、<code>_duration</code>、<code>_radius</code>、<code>_token</code><br>    其中, <code>id</code> 表示一个飞船从指挥官那里得到的令牌, 飞船也是通过这个令牌来判断信号发射塔发送过来的信号是不是自己的, <code>_duration</code> 表示一个飞船的耐久, <code>_radius</code> 表示这个飞船在轨道上的位置, <code>_token</code> 表示这个飞船的唯一编号, 用于区分 <code>id</code> 相同的飞船(即令牌回收了, 但是飞船没有接收到销毁命令的情况下, 会导致 <code>id</code> 重复)<br>    方法包括： <code>fly</code>、<code>stop</code><br>        <code>fly</code> 时, <code>_duration</code> 每秒自减 5%, 最低为 0, 成为 0 时 <code>stop</code>, 直到再次接受到命令<br>        <code>stop</code>, <code>_duration</code> 每秒自加 2%, 最高为 100%, 成为 100% 消除自加定时器<br>        <code>_updateState</code> 方法, 根据 <code>this._state</code> 的值不断刷新 <code>this._duration</code></p>
+<h2 id="refreshPosition-函数的编写"><a href="#refreshPosition-函数的编写" class="headerlink" title="_refreshPosition 函数的编写"></a>_refreshPosition 函数的编写</h2><p>通过检查 <code>this.state</code> 来决定自己是否需要被调用, 只不过最开始的调用由 <code>fly()</code> 函数完成, 一旦 <code>this.state</code> 的值变为 <code>stop</code>, 就清除对自己的调用(也清除定时器)。等到下一次 <code>fly()</code> 被调用时, <code>_refreshPosition</code> 函数将再次被调用。<br>默认 10s 转一圈, 所以每一次位置刷新, 弧度增加 <code>1/600 * 2 * Math.PI</code>(0.010471975511965978)</p>
+<h2 id="spaceship-函数的实现"><a href="#spaceship-函数的实现" class="headerlink" title="spaceship 函数的实现"></a>spaceship 函数的实现</h2><p>首先, 通过扫描 <code>players</code> 中的飞船的数据来实时生成最新的飞船外观(<code>facade</code>), 然后再依次对已有的飞船进行分别的绘制, 最后绘制星球, 然后等待下一次渲染。<br>其中, 外观信息包括飞船编号、根据飞船耐久度显示出来的文字、根据飞船耐久度显示的遮罩、飞船的外壳, 这里可以通过使用图片来当飞船的外壳的方式来提升性能, 但是因为是练习项目, 要练习 canvas 的 API 的使用, 就直接实时绘出来了。</p>
+<h2 id="任务-27-中需要改变的地方"><a href="#任务-27-中需要改变的地方" class="headerlink" title="任务 27 中需要改变的地方"></a>任务 27 中需要改变的地方</h2><ol>
+<li>改变 <code>Class Player {}</code> 的构造函数的传参数结构, 改 <code>...args</code> 为解构赋值; ✅</li>
+<li>改变指挥官在发出增加飞船时传递的参数, 由原本只传递一个 <code>token</code> 改为传递 id + orbit + power ✅</li>
+<li>改变飞船类内部更新状态的参数, 改为由 <code>orbit</code> 和 <code>power</code> 决定参数更新的方式 ✅ </li>
+<li>改变 <code>mediator</code> 内部的 <code>addPlayer</code> 的参数接收和传出方式 ✅</li>
+<li>改 <code>space</code> 为 <code>BUS</code>; ✅</li>
+<li>在 <code>mediator</code> 内部增加一个 <code>Adapter</code>, 将指挥官传进来的参数进行映射, 然后再经由 <code>BUS</code> 传给 <code>Player</code> 的实例; ✅</li>
+<li>实例增加一个原型方法, 即解调器(适配器) <code>Adapter</code>, 这个方法将传进来的参数进行映射, 映射为自己可以接收的命令, 包括生成自己时所需要的参数 ✅</li>
+<li>需要检查绘图部分的函数, 会不会受到上面这些内容的改变的影响 ✅</li>
+<li>绘图的函数内部, 增加计算线速度的部分, 因为飞船最多 4 条, 所以参数写死成 5 正确<blockquote>
+<p>一共 4 条轨道, 最高轨道的角速度为最低轨道的速度的 40%<br>speed = (5 - this.orbit) * 20%;</p>
+</blockquote>
+</li>
+<li>改变 eventClear 传递给指挥官的参数的形式, 在需要起飞新的飞船时, 增加参数的数量 ✅</li>
+<li>改变 mediator 给飞船传递参数的方式, 由指定飞船编号、发送命令, 改为广播 正确<br>mediator 内部的对 <code>players</code> 的管理方式怎么改变? ✅</li>
+</ol>
+<p>不需要添加 <code>listener</code>, 因为 <code>players</code> 本身就是需要被监听的对象的集合。<br>every time when mediator received any command, it will be execute on every element in <code>players</code> with <code>BUS</code> to be called. </p>
+<h2 id="任务-28-中需要改变的地方"><a href="#任务-28-中需要改变的地方" class="headerlink" title="任务 28 中需要改变的地方"></a>任务 28 中需要改变的地方</h2><ol>
+<li>改变 BUS， 将 BUS 变为一个全局的函数</li>
+<li>改变 BUS 函数的功能, 改为传参 {fn: fn, argus: argus}</li>
+<li>改变飞船的 Adapter, 变为可以对信号进行 encode/decode</li>
+<li>mediator 增加一个接收器功能, 用于接受来自 BUS 的数据</li>
+<li>增加一个 DC 对象, 功能是存储每一艘飞船返回来的状态信息<blockquote>
+<p>DC 本身是一个观察者, 提供监听功能, 一旦数据得到更新, 就调用第 6 点的 DOM 渲染函数, 对 DOM 节点进行重新渲染<br>为了避免 repainting 整个页面, 将大屏幕固定在右侧, 不参与整个页面的布局</p>
+</blockquote>
+</li>
+<li>基于装饰者模式实现一个 DOM 渲染函数, 负责渲染大屏幕(数据源来自 DC)</li>
+</ol>
+<p><code>Player</code> 的 <code>feedback()</code> 方法:</p>
+<ol>
+<li>当 <code>_updateState()</code> 方法被调用时, 这个方法也被调用, 用于给 <code>DC</code> (数据中心) 传递最新的自己的状态信息, 便于数据中心更新大屏幕上显示的信息</li>
+<li>当 <code>_die()</code> 方法被调用时, 这个方法也被调用, 给 <code>DC</code> 传递销毁这个飞船在数据中心的数据(对象)</li>
+</ol>
+<p><code>DC</code> 的 ｀playerData｀ 属性:<br>用于给大屏幕提供用于显示飞船状态的信息<br><code>DC</code> 的 <code>receiver()</code> 方法:<br>用于接收来自 <code>mediator</code> 的信息(源自每一个 <code>player</code>), 根据数据来决定对对象的处理方式</p>
+<p>通过 <code>checkEqual()</code> 在 <code>DC</code> 中, 检查飞船的状态是否发生改变, 如果没有发生改变, 就不重新渲染 DOM 了<br>通过 <code>renderScreen()</code> 渲染大屏幕</p>
+<h2 id="非常明显可以进行优化的地方："><a href="#非常明显可以进行优化的地方：" class="headerlink" title="非常明显可以进行优化的地方："></a>非常明显可以进行优化的地方：</h2><ol>
+<li>适配器, 进行功能的分离和抽取</li>
+<li>适配器中的编码转换, 在全局定义一个通用的变量, 或者挂在 <code>Player</code> 上, 从原型中提取编码</li>
+<li>随着任务 26-28 的进行, 代码的耦合度变得很大, 有些地方可以重新编写, 降低耦合度</li>
+<li>可以用精灵兔代替实时绘制出来的飞船形状，能够提升性能</li>
+</ol>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+
+
+  
+  
+  <ul class="breadcrumb">
+    
+      
+      
+        
+          <li><a href="/demos/">DEMOS</a></li>
+          
+            
+          
+        
+      
+    
+      
+      
+        
+          <li>TASK_2_28</li>
+        
+      
+    
+      
+      
+        
+          <li><a href="/demos/note.html/">NOTE.HTML</a></li>
+          
+            
+          
+        
+      
+    
+  </ul>
+
+
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">olaf cheng</p>
+              <p class="site-description motion-element" itemprop="description">纸上得来终觉浅，绝知此事要躬行。</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#eventClear"><span class="nav-number">1.</span> <span class="nav-text">eventClear</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#commander"><span class="nav-number">2.</span> <span class="nav-text">commander</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mediator"><span class="nav-number">3.</span> <span class="nav-text">mediator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Player"><span class="nav-number">4.</span> <span class="nav-text">Player</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#refreshPosition-函数的编写"><span class="nav-number">5.</span> <span class="nav-text">_refreshPosition 函数的编写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spaceship-函数的实现"><span class="nav-number">6.</span> <span class="nav-text">spaceship 函数的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任务-27-中需要改变的地方"><span class="nav-number">7.</span> <span class="nav-text">任务 27 中需要改变的地方</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任务-28-中需要改变的地方"><span class="nav-number">8.</span> <span class="nav-text">任务 28 中需要改变的地方</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非常明显可以进行优化的地方："><span class="nav-number">9.</span> <span class="nav-text">非常明显可以进行优化的地方：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">olaf cheng</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

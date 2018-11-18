@@ -1,0 +1,45 @@
+body {
+  font-size: 12px;
+}
+
+#container {
+  width: 16rem;
+  height: 4rem;
+}
+
+@keyframes toTransparent {
+  0% {background: slategray;}
+  100% {background: rgba(0, 0, 0, 0)}
+}
+
+#mask {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.mask {
+  float: left;
+  width: 2rem;
+  height: 2rem;
+  background-color: slategray;
+  animation: 0.4s toTransparent forwards;
+  animation-play-state: paused;
+}
+
+.mask:hover {
+  animation-play-state: running;
+}
+
+p {
+  position: relative;
+  top: -4rem;
+  color: green;
+  font-size: 2rem;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 4rem;
+  height: 4rem;
+  margin: 0;
+  overflow: hidden;
+}
