@@ -108,17 +108,17 @@
 
 
 
-  <meta name="description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button {">
+  <meta name="description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button.next">
 <meta property="og:type" content="website">
 <meta property="og:title" content="olaf&#39;s site">
 <meta property="og:url" content="https://olafcheng.github.io/demos/EADGBE/index.html">
 <meta property="og:site_name" content="olaf&#39;s site">
-<meta property="og:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button {">
+<meta property="og:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button.next">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2018-11-18T09:20:09.000Z">
+<meta property="og:updated_time" content="2018-11-18T10:22:07.317Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="olaf&#39;s site">
-<meta name="twitter:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button {">
+<meta name="twitter:description" content="EADGBE        .demo-container {       display: flex;       flex-direction: column;       align-items: center;       font-family: &apos;Courier New&apos;, Courier, monospace;     }      button.next">
 
 
 
@@ -343,15 +343,46 @@
       font-family: 'Courier New', Courier, monospace;
     }
 
-    button {
+    button.next {
       background-color: #1B9AF7;
       border-color: #1B9AF7;
       color: white;
       font-family: inherit;
       cursor: pointer;
     }
-    button:focus{
+    button.next:focus{
       outline:0;
+    }
+
+    .auto_mode {
+      margin-top: 3vh;
+    }
+
+    .auto_mode label {
+      font-size: 7vw;
+    }
+
+    .auto_mode input {
+      font-size: 3vh;
+      width: 15vw;
+      border: none;
+      border-bottom: 1px solid black;
+      text-align: center;
+    }
+
+    .auto_mode p {
+      font-size: 4vw;
+    }
+
+    .auto_mode button {
+      background-color: #1B9AF7;
+      border-color: #1B9AF7;
+      border-radius: 4vw;
+      color: white;
+      width: 15vw;
+      line-height: 5vh;
+      font-size: 6vw;
+      font-weight: bold;
     }
 
     @media (min-width: 1281px) {
@@ -359,7 +390,7 @@
         font-size: 20vw;
         line-height: 30vw;
       }
-      button {
+      button.next {
         border-radius: 1vw;
         width: 80%;
         height: 22vh;
@@ -373,7 +404,7 @@
         line-height: 75vh;
       }
 
-      button {
+      button.next {
         width: 75vw;
         height: 10vh;
         line-height: 10vh;
@@ -386,9 +417,16 @@
 <body>
   <div class="demo-container">
     <div class="letter-name"></div>
-    <button>NEXT</button>
+    <button class="next">NEXT</button>
+    <div class="auto_mode">
+      <label for="timer">Timer:</label>
+      <input type="number">S
+      <button class="auto_mode_switcher">OFF</button>
+      <p>The minimum interval is 0.3 s.</p>
+    </div>
   </div>
   <script>
+    const MIN_INTERVAL = 0.3;
     const container = document.getElementsByClassName('letter-name')[0];
     const letters = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const getRandomLetter = () => letters[Math.round(Math.random() * 6)];
@@ -407,7 +445,49 @@
     update();
 
     window.addEventListener('keydown', e => (e.code === 'Space' && update()));
-    document.querySelector('.demo-container button').addEventListener('click', update);
+
+    // auto mode
+    const switcher = document.querySelector('.auto_mode_switcher');
+    const input = document.querySelector('input');
+    const SWITCHER_STATE = {
+      ON: 'ON',
+      OFF: 'OFF'
+    };
+    let currentSwitcherState = SWITCHER_STATE.OFF;
+    let timerHandler = null;
+    let isInLoop = false;
+    const enterLoop = () => {
+      isInLoop = true;
+      const delay = +input.value < MIN_INTERVAL ? Math.round(MIN_INTERVAL * 1000) : Math.round(+input.value * 1000);
+      timerHandler = setTimeout(() => {
+        isInLoop = false;
+        update();
+        enterLoop();
+      }, delay);
+    };
+    const endLoop = () => clearTimeout(timerHandler);
+
+    const onSwitcher = () => switcher.textContent = SWITCHER_STATE.ON;
+    const offSwitcher = () => switcher.textContent = SWITCHER_STATE.OFF;
+
+    switcher.addEventListener('click', e => {
+      if(switcher.textContent === SWITCHER_STATE.OFF) {
+        currentSwitcherState = (switcher.textContent = SWITCHER_STATE.ON);
+        enterLoop();
+      } else {
+        currentSwitcherState = (switcher.textContent = SWITCHER_STATE.OFF);
+        endLoop();
+      }
+    });
+
+    document.querySelector('.demo-container .next').addEventListener('click', () => {
+      isInLoop && endLoop();
+      update();
+      currentSwitcherState === SWITCHER_STATE.ON && enterLoop();
+    });
+
+    input.addEventListener('focus', endLoop);
+    input.addEventListener('blur', () => currentSwitcherState === SWITCHER_STATE.ON && enterLoop());
   </script>
 </body>
 </html>
